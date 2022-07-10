@@ -25,7 +25,7 @@ class CasesCollection
      */
     public function __construct(protected array $cases)
     {
-        $this->enumIsBacked = ($cases[0] ?? null) instanceof BackedEnum;
+        $this->enumIsBacked = $this->first() instanceof BackedEnum;
     }
 
     /**
@@ -39,9 +39,28 @@ class CasesCollection
     }
 
     /**
+     * Retrieve the first case
+     *
+     * @param callable|null $callback
+     * @return mixed
+     */
+    public function first(callable $callback = null): mixed
+    {
+        $callback ??= fn () => true;
+
+        foreach ($this->cases as $case) {
+            if ($callback($case)) {
+                return $case;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Retrieve the cases keyed by name
      *
-     * @return array<string, UnitEnum>
+     * @return array<string, mixed>
      */
     public function keyByName(): array
     {
@@ -52,7 +71,7 @@ class CasesCollection
      * Retrieve the cases keyed by the given key
      *
      * @param callable|string $key
-     * @return array<string, UnitEnum>
+     * @return array<string, mixed>
      */
     public function keyBy(callable|string $key): array
     {
@@ -68,7 +87,7 @@ class CasesCollection
     /**
      * Retrieve the cases keyed by value
      *
-     * @return array<string, UnitEnum>
+     * @return array<string, mixed>
      */
     public function keyByValue(): array
     {
