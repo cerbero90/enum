@@ -72,10 +72,10 @@ trait Hydrates
      *
      * @param callable|string $key
      * @param mixed $value
-     * @return CasesCollection|static
+     * @return CasesCollection
      * @throws ValueError
      */
-    public static function fromKey(callable|string $key, mixed $value): CasesCollection|static
+    public static function fromKey(callable|string $key, mixed $value): CasesCollection
     {
         if ($result = static::tryFromKey($key, $value)) {
             return $result;
@@ -91,9 +91,9 @@ trait Hydrates
      *
      * @param callable|string $key
      * @param mixed $value
-     * @return CasesCollection|static|null
+     * @return CasesCollection|null
      */
-    public static function tryFromKey(callable|string $key, mixed $value): CasesCollection|static|null
+    public static function tryFromKey(callable|string $key, mixed $value): CasesCollection|null
     {
         $cases = [];
 
@@ -103,11 +103,7 @@ trait Hydrates
             }
         }
 
-        return match (count($cases)) {
-            0 => null,
-            1 => $cases[0],
-            default => new CasesCollection($cases),
-        };
+        return $cases ? new CasesCollection($cases) : null;
     }
 
     /**

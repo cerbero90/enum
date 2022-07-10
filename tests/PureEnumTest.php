@@ -276,40 +276,40 @@ it('retrieves the case hydrated from a name or returns null')
         ['four', null],
     ]);
 
-it('retrieves the case hydrated from a key')
-    ->expect(fn (callable|string $key, mixed $value, PureEnum $case) => PureEnum::fromKey($key, $value) === $case)
+it('retrieves the cases hydrated from a key')
+    ->expect(fn (string $key, mixed $value, array $cases) => PureEnum::fromKey($key, $value)->cases() === $cases)
     ->toBeTrue()
     ->with([
-        ['color', 'red', PureEnum::one],
-        ['name', 'three', PureEnum::three],
+        ['color', 'red', [PureEnum::one]],
+        ['name', 'three', [PureEnum::three]],
+        ['odd', true, [PureEnum::one, PureEnum::three]],
     ]);
 
-it('retrieves all cases hydrated from a key')
-    ->expect(PureEnum::fromKey('odd', true))
+it('retrieves the cases hydrated from a key using a closure')
+    ->expect(PureEnum::fromKey(fn (PureEnum $case) => $case->shape(), 'square'))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
-    ->toBe([PureEnum::one, PureEnum::three]);
-
-it('retrieves the case hydrated from a key using a closure')
-    ->expect(PureEnum::fromKey(fn (PureEnum $case) => $case->shape(), 'square'))
-    ->toBe(PureEnum::two);
+    ->toBe([PureEnum::two]);
 
 it('throws a value error when hydrating cases with an invalid key', fn () => PureEnum::fromKey('color', 'orange'))
     ->throws(ValueError::class, 'Invalid value for the key "color" for enum "Cerbero\Enum\PureEnum"');
 
 it('retrieves the case hydrated from a key or returns null')
-    ->expect(fn (callable|string $key, mixed $value, ?PureEnum $case) => PureEnum::tryFromKey($key, $value) === $case)
+    ->expect(fn (string $key, mixed $value, ?array $cases) => PureEnum::tryFromKey($key, $value)?->cases() === $cases)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
-        ['color', 'red', PureEnum::one],
-        ['name', 'three', PureEnum::three],
+        ['color', 'red', [PureEnum::one]],
+        ['name', 'three', [PureEnum::three]],
+        ['odd', true, [PureEnum::one, PureEnum::three]],
         ['shape', 'rectangle', null],
     ]);
 
 it('attempts to retrieve the case hydrated from a key using a closure')
     ->expect(PureEnum::tryFromKey(fn (PureEnum $case) => $case->shape(), 'square'))
-    ->toBe(PureEnum::two);
+    ->toBeInstanceOf(CasesCollection::class)
+    ->cases()
+    ->toBe([PureEnum::two]);
 
 it('retrieves the key of a case')
     ->expect(fn (string $key, mixed $value) => PureEnum::one->get($key) === $value)
@@ -329,25 +329,53 @@ it('throws a value error when attempting to retrieve an invalid key', fn () => P
 
 it('retrieves the case hydrated from a key dynamically')
     ->expect(PureEnum::fromColor('red'))
-    ->toBe(PureEnum::one);
+    ->toBeInstanceOf(CasesCollection::class)
+    ->cases()
+    ->toBe([PureEnum::one]);
 
-it('retrieves all cases hydrated from a key dynamically')
+it('retrieves all cases hydrated from a key dynamically without value')
     ->expect(PureEnum::fromOdd())
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([PureEnum::one, PureEnum::three]);
 
+it('retrieves all cases hydrated from a key dynamically')
+    ->expect(PureEnum::fromOdd(false))
+    ->toBeInstanceOf(CasesCollection::class)
+    ->cases()
+    ->toBe([PureEnum::two]);
+
 it('throws a value error when hydrating cases with an invalid key dynamically', fn () => PureEnum::fromOdd(123))
     ->throws(ValueError::class, 'Invalid value for the key "odd" for enum "Cerbero\Enum\PureEnum"');
 
-it('attempts to retrieve the case hydrated from a key dynamically')
+it('attempts to retrieve the cases hydrated from a key dynamically')
     ->expect(PureEnum::tryFromColor('red'))
-    ->toBe(PureEnum::one)
+    ->toBeInstanceOf(CasesCollection::class)
+    ->cases()
+    ->toBe([PureEnum::one])
     ->and(PureEnum::tryFromColor('violet'))
     ->toBeNull();
 
-it('attempts to retrieve all cases hydrated from a key dynamically')
+it('attempts to retrieve the cases hydrated from a key dynamically without value')
     ->expect(PureEnum::tryFromOdd())
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([PureEnum::one, PureEnum::three]);
+
+it('attempts to retrieve the cases hydrated from a key dynamically with value')
+    ->expect(PureEnum::tryFromOdd(false))
+    ->toBeInstanceOf(CasesCollection::class)
+    ->cases()
+    ->toBe([PureEnum::two]);
+
+it('retrieves the first case of a collection')
+    ->expect(PureEnum::tryFromOdd())
+    ->toBeInstanceOf(CasesCollection::class)
+    ->first()
+    ->toBe(PureEnum::one);
+
+it('retrieves the first case of a collection based on a closure')
+    ->expect(PureEnum::tryFromOdd())
+    ->toBeInstanceOf(CasesCollection::class)
+    ->first(fn (PureEnum $case) => $case->name === 'three')
+    ->toBe(PureEnum::three);
