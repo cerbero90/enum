@@ -39,6 +39,16 @@ class CasesCollection
     }
 
     /**
+     * Retrieve the count of cases
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->cases);
+    }
+
+    /**
      * Retrieve the first case
      *
      * @param callable|null $callback
@@ -191,7 +201,7 @@ class CasesCollection
      */
     public function onlyValues(string|int ...$value): static
     {
-        return $this->filter(fn (UnitEnum $enum) => $this->enumIsBacked && in_array($enum->value, $value));
+        return $this->filter(fn (UnitEnum $enum) => $this->enumIsBacked && in_array($enum->value, $value, true));
     }
 
     /**
@@ -202,7 +212,7 @@ class CasesCollection
      */
     public function exceptValues(string|int ...$value): static
     {
-        return $this->filter(fn (UnitEnum $enum) => $this->enumIsBacked && !in_array($enum->value, $value));
+        return $this->filter(fn (UnitEnum $enum) => $this->enumIsBacked && !in_array($enum->value, $value, true));
     }
 
     /**
@@ -273,15 +283,5 @@ class CasesCollection
     public function sortDescByValue(): static
     {
         return $this->enumIsBacked ? $this->sortDescBy('value') : new static([]);
-    }
-
-    /**
-     * Retrieve the count of cases
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return count($this->cases);
     }
 }
