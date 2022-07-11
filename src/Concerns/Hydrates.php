@@ -105,19 +105,4 @@ trait Hydrates
 
         return $cases ? new CasesCollection($cases) : null;
     }
-
-    /**
-     * Retrieve cases hydrated from keys dynamically
-     *
-     * @param string $name
-     * @param array $parameters
-     * @return CasesCollection|static|null
-     */
-    public static function __callStatic(string $name, array $parameters): CasesCollection|static|null
-    {
-        return match (0) {
-            strpos($name, 'from') => static::fromKey(lcfirst(substr($name, 4)), $parameters[0] ?? true),
-            strpos($name, 'tryFrom') => static::tryFromKey(lcfirst(substr($name, 7)), $parameters[0] ?? true),
-        };
-    }
 }
