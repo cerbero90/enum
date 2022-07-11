@@ -199,3 +199,18 @@ it('retrieves a collection of cases sorted by value decending', function () {
         ->cases()
         ->toBe([BackedEnum::three, BackedEnum::two, BackedEnum::one]);
 });
+
+it('retrieves the iterator', function () {
+    expect((new CasesCollection(PureEnum::cases()))->getIterator())
+        ->toBeInstanceOf(Traversable::class);
+});
+
+it('iterates cases within a loop', function () {
+    $i = 0;
+    $collection = new CasesCollection(PureEnum::cases());
+    $expected = [PureEnum::one, PureEnum::two, PureEnum::three];
+
+    foreach ($collection as $case) {
+        expect($case)->toBe($expected[$i++]);
+    }
+});

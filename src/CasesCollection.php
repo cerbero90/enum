@@ -3,13 +3,16 @@
 namespace Cerbero\Enum;
 
 use BackedEnum;
+use Countable;
+use IteratorAggregate;
+use Traversable;
 use UnitEnum;
 
 /**
  * The collection of enum cases.
  *
  */
-class CasesCollection
+class CasesCollection implements Countable, IteratorAggregate
 {
     /**
      * Whether the cases belong to a backed enum
@@ -26,6 +29,20 @@ class CasesCollection
     public function __construct(protected array $cases)
     {
         $this->enumIsBacked = $this->first() instanceof BackedEnum;
+    }
+
+    /**
+     * Retrieve the iterable cases
+     *
+     * @return Traversable
+     */
+    public function getIterator(): Traversable
+    {
+        return (function () {
+            foreach ($this->cases as $case) {
+                yield $case;
+            }
+        })();
     }
 
     /**
