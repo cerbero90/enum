@@ -23,6 +23,10 @@ it('retrieves all the keys of the cases')
     ->expect(PureEnum::keys('color'))
     ->toBe(['red', 'green', 'blue']);
 
+it('retrieves all the keys of the cases with a closure')
+    ->expect(PureEnum::keys(fn (PureEnum $case) => $case->shape()))
+    ->toBe(['triangle', 'square', 'circle']);
+
 it('throws a value error when requesting an invalid key', fn () => PureEnum::keys('invalid'))
     ->throws(ValueError::class, '"invalid" is not a valid key for enum "Cerbero\Enum\PureEnum"');
 
