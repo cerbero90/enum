@@ -179,7 +179,7 @@ class CasesCollection
      */
     public function only(string ...$name): static
     {
-        return $this->filter(fn (UnitEnum $enum) => in_array($enum->name, $name));
+        return $this->filter(fn (UnitEnum $case) => in_array($case->name, $name));
     }
 
     /**
@@ -190,7 +190,7 @@ class CasesCollection
      */
     public function except(string ...$name): static
     {
-        return $this->filter(fn (UnitEnum $enum) => !in_array($enum->name, $name));
+        return $this->filter(fn (UnitEnum $case) => !in_array($case->name, $name));
     }
 
     /**
@@ -201,7 +201,7 @@ class CasesCollection
      */
     public function onlyValues(string|int ...$value): static
     {
-        return $this->filter(fn (UnitEnum $enum) => $this->enumIsBacked && in_array($enum->value, $value, true));
+        return $this->filter(fn (UnitEnum $case) => $this->enumIsBacked && in_array($case->value, $value, true));
     }
 
     /**
@@ -212,7 +212,7 @@ class CasesCollection
      */
     public function exceptValues(string|int ...$value): static
     {
-        return $this->filter(fn (UnitEnum $enum) => $this->enumIsBacked && !in_array($enum->value, $value, true));
+        return $this->filter(fn (UnitEnum $case) => $this->enumIsBacked && !in_array($case->value, $value, true));
     }
 
     /**
