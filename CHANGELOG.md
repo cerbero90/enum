@@ -20,3 +20,9 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 
 ### Security
 - Nothing
+
+
+## 1.0.0 - 2022-07-12
+
+### Added
+- First implementation of the package
