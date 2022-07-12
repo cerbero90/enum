@@ -57,6 +57,13 @@ it('retrieves a collection with the filtered cases')
     ->cases()
     ->toBe([BackedEnum::one, BackedEnum::two]);
 
+it('retrieves a collection with cases filtered by a key', function () {
+    expect(BackedEnum::filter('isOdd'))
+        ->toBeInstanceOf(CasesCollection::class)
+        ->cases()
+        ->toBe([BackedEnum::one, BackedEnum::three]);
+});
+
 it('retrieves a collection of cases having the given names')
     ->expect(BackedEnum::only('two', 'three'))
     ->toBeInstanceOf(CasesCollection::class)

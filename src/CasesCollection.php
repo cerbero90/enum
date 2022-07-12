@@ -185,11 +185,12 @@ class CasesCollection implements Countable, IteratorAggregate
     /**
      * Retrieve a collection with the filtered cases
      *
-     * @param callable $callback
+     * @param callable|string $filter
      * @return static
      */
-    public function filter(callable $callback): static
+    public function filter(callable|string $filter): static
     {
+        $callback = is_callable($filter) ? $filter : fn (mixed $case) => $case->get($filter) === true;
         $cases = array_filter($this->cases, $callback);
 
         return new static(array_values($cases));

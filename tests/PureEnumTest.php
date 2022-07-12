@@ -62,6 +62,13 @@ it('retrieves a collection with the filtered cases', function () {
         ->toBe([PureEnum::one, PureEnum::two]);
 });
 
+it('retrieves a collection with cases filtered by a key', function () {
+    expect(PureEnum::filter('isOdd'))
+        ->toBeInstanceOf(CasesCollection::class)
+        ->cases()
+        ->toBe([PureEnum::one, PureEnum::three]);
+});
+
 it('retrieves a collection of cases having the given names', function () {
     expect(PureEnum::only('two', 'three'))
         ->toBeInstanceOf(CasesCollection::class)

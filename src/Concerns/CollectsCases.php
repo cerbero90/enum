@@ -95,12 +95,12 @@ trait CollectsCases
     /**
      * Retrieve a collection with the filtered cases
      *
-     * @param callable $callback
+     * @param callable|string $filter
      * @return CasesCollection
      */
-    public static function filter(callable $callback): CasesCollection
+    public static function filter(callable|string $filter): CasesCollection
     {
-        return static::collect()->filter($callback);
+        return static::collect()->filter($filter);
     }
 
     /**
