@@ -29,6 +29,7 @@ composer require cerbero/enum
 * [Comparison](#comparison)
 * [Keys resolution](#keys-resolution)
 * [Hydration](#hydration)
+* [Elaborating cases](#elaborating-cases)
 * [Cases collection](#cases-collection)
 
 To supercharge our enums with all functionalities provided by this package, we can simply use the `Enumerates` trait in both pure enums and backed enums:
@@ -151,7 +152,7 @@ enum BackedEnum: int
 }
 ```
 
-The keys defined in this enum are `name`, `value` (as it is a backed enum), `color`, `isOdd`. We can retrieve any key assigned to a case by calling `get()`:
+The keys defined in this enum are `name`, `value` (as it is a backed enum), `color` and `isOdd`. We can retrieve any key assigned to a case by calling `get()`:
 
 ```php
 PureEnum::one->get('name'); // 'one'
@@ -174,7 +175,7 @@ BackedEnum::one->color(); // 'red'
 BackedEnum::one->isOdd(); // true
 ```
 
-However `get()` is useful to resolve keys dynamically as a key may be a property, a method or a closure. It also gets called internally for more advanced functionalities that we are going to explore very soon.
+However `get()` is useful to resolve keys dynamically as a key may be a property, a method or a closure. It often gets called internally for more advanced functionalities that we are going to explore very soon.
 
 
 ### Hydration
@@ -190,20 +191,14 @@ PureEnum::fromName('one'); // PureEnum::one
 PureEnum::fromName('four'); // throws ValueError
 PureEnum::tryFromName('one'); // PureEnum::one
 PureEnum::tryFromName('four'); // null
-PureEnum::fromKey('name', 'one'); // PureEnum::one
+PureEnum::fromKey('name', 'one'); // CasesCollection<PureEnum::one>
 PureEnum::fromKey('value', 1); // throws ValueError
-PureEnum::fromKey('color', 'red'); // PureEnum::one
+PureEnum::fromKey('color', 'red'); // CasesCollection<PureEnum::one>
 PureEnum::fromKey(fn (PureEnum $case) => $case->isOdd(), true); // CasesCollection<PureEnum::one, PureEnum::three>
-PureEnum::tryFromKey('name', 'one'); // PureEnum::one
+PureEnum::tryFromKey('name', 'one'); // CasesCollection<PureEnum::one>
 PureEnum::tryFromKey('value', 1); // null
-PureEnum::tryFromKey('color', 'red'); // PureEnum::one
+PureEnum::tryFromKey('color', 'red'); // CasesCollection<PureEnum::one>
 PureEnum::tryFromKey(fn (PureEnum $case) => $case->isOdd(), true); // CasesCollection<PureEnum::one, PureEnum::three>
-PureEnum::fromColor('red'); // PureEnum::one
-PureEnum::fromInvalid('invalid'); // throws ValueError
-PureEnum::fromIsOdd(); // CasesCollection<PureEnum::one, PureEnum::three>
-PureEnum::tryFromColor('red'); // PureEnum::one
-PureEnum::tryFromInvalid('invalid'); // null
-PureEnum::tryFromIsOdd(); // CasesCollection<PureEnum::one, PureEnum::three>
 
 BackedEnum::from(1); // BackedEnum::one
 BackedEnum::from('1'); // throws ValueError
@@ -213,20 +208,170 @@ BackedEnum::fromName('one'); // BackedEnum::one
 BackedEnum::fromName('four'); // throws ValueError
 BackedEnum::tryFromName('one'); // BackedEnum::one
 BackedEnum::tryFromName('four'); // null
-BackedEnum::fromKey('name', 'one'); // BackedEnum::one
-BackedEnum::fromKey('value', 1); // BackedEnum::one
-BackedEnum::fromKey('color', 'red'); // BackedEnum::one
+BackedEnum::fromKey('name', 'one'); // CasesCollection<BackedEnum::one>
+BackedEnum::fromKey('value', 1); // CasesCollection<BackedEnum::one>
+BackedEnum::fromKey('color', 'red'); // CasesCollection<BackedEnum::one>
 BackedEnum::fromKey(fn (BackedEnum $case) => $case->isOdd(), true); // CasesCollection<BackedEnum::one, BackedEnum::three>
-BackedEnum::tryFromKey('name', 'one'); // BackedEnum::one
-BackedEnum::tryFromKey('value', 1); // BackedEnum::one
-BackedEnum::tryFromKey('color', 'red'); // BackedEnum::one
+BackedEnum::tryFromKey('name', 'one'); // CasesCollection<BackedEnum::one>
+BackedEnum::tryFromKey('value', 1); // CasesCollection<BackedEnum::one>
+BackedEnum::tryFromKey('color', 'red'); // CasesCollection<BackedEnum::one>
 BackedEnum::tryFromKey(fn (BackedEnum $case) => $case->isOdd(), true); // CasesCollection<BackedEnum::one, BackedEnum::three>
-BackedEnum::fromColor('red'); // BackedEnum::one
-BackedEnum::fromInvalid('invalid'); // throws ValueError
-BackedEnum::fromIsOdd(); // CasesCollection<BackedEnum::one, BackedEnum::three>
-BackedEnum::tryFromColor('red'); // BackedEnum::one
-BackedEnum::tryFromInvalid('invalid'); // null
-BackedEnum::tryFromIsOdd(); // CasesCollection<BackedEnum::one, BackedEnum::three>
+```
+
+While pure enums try to hydrate cases from names, backed enums can hydrate from both names and values. Even keys can be used to hydrate cases, cases are then wrapped into a [`CasesCollection`](#cases-collection) to allow further processing.
+
+
+### Elaborating cases
+
+There is a bunch of operations that can be performed on the cases of an enum. If the result of an operation is a plain list of cases, they get wrapped into a [`CasesCollection`](#cases-collection) for additional elaboration, otherwise the final result of the operation is returned:
+
+```php
+PureEnum::collect(); // CasesCollection<PureEnum::one, PureEnum::two, PureEnum::three>
+PureEnum::count(); // 3
+PureEnum::casesByName(); // ['one' => PureEnum::one, 'two' => PureEnum::two, 'three' => PureEnum::three]
+PureEnum::casesByValue(); // []
+PureEnum::casesBy('color'); // ['red' => PureEnum::one, 'green' => PureEnum::two, 'blue' => PureEnum::three]
+PureEnum::groupBy('color'); // ['red' => [PureEnum::one], 'green' => [PureEnum::two], 'blue' => [PureEnum::three]]
+PureEnum::names(); // ['one', 'two', 'three']
+PureEnum::values(); // []
+PureEnum::pluck(); // ['one', 'two', 'three']
+PureEnum::pluck('color'); // ['red', 'green', 'blue']
+PureEnum::pluck(fn (PureEnum $case) => $case->isOdd()); // [true, false, true]
+PureEnum::pluck('color', 'shape'); // ['triangle' => 'red', 'square' => 'green', 'circle' => 'blue']
+PureEnum::pluck(fn (PureEnum $case) => $case->isOdd(), fn (PureEnum $case) => $case->name); // ['one' => true, 'two' => false, 'three' => true]
+PureEnum::filter('isOdd'); // CasesCollection<PureEnum::one, PureEnum::three>
+PureEnum::filter(fn (PureEnum $case) => $case->isOdd()); // CasesCollection<PureEnum::one, PureEnum::three>
+PureEnum::only('two', 'three'); // CasesCollection<PureEnum::two, PureEnum::three>
+PureEnum::except('two', 'three'); // CasesCollection<PureEnum::one>
+PureEnum::onlyValues(2, 3); // CasesCollection<>
+PureEnum::exceptValues(2, 3); // CasesCollection<>
+PureEnum::sort(); // CasesCollection<PureEnum::one, PureEnum::three, PureEnum::two>
+PureEnum::sortDesc(); // CasesCollection<PureEnum::two, PureEnum::three, PureEnum::one>
+PureEnum::sortByValue(); // CasesCollection<>
+PureEnum::sortDescByValue(); // CasesCollection<>
+PureEnum::sortBy('color'); // CasesCollection<PureEnum::three, PureEnum::two, PureEnum::one>
+PureEnum::sortDescBy(fn (PureEnum $case) => $case->color()); // CasesCollection<PureEnum::one, PureEnum::two, PureEnum::three>
+
+BackedEnum::collect(); // CasesCollection<BackedEnum::one, BackedEnum::two, BackedEnum::three>
+BackedEnum::count(); // 3
+BackedEnum::casesByName(); // ['one' => BackedEnum::one, 'two' => BackedEnum::two, 'three' => BackedEnum::three]
+BackedEnum::casesByValue(); // [1 => BackedEnum::one, 2 => BackedEnum::two, 3 => BackedEnum::three]
+BackedEnum::casesBy('color'); // ['red' => BackedEnum::one, 'green' => BackedEnum::two, 'blue' => BackedEnum::three]
+BackedEnum::groupBy('color'); // ['red' => [BackedEnum::one], 'green' => [BackedEnum::two], 'blue' => [BackedEnum::three]]
+BackedEnum::names(); // ['one', 'two', 'three']
+BackedEnum::values(); // [1, 2, 3]
+BackedEnum::pluck(); // [1, 2, 3]
+BackedEnum::pluck('color'); // ['red', 'green', 'blue']
+BackedEnum::pluck(fn (BackedEnum $case) => $case->isOdd()); // [true, false, true]
+BackedEnum::pluck('color', 'shape'); // ['triangle' => 'red', 'square' => 'green', 'circle' => 'blue']
+BackedEnum::pluck(fn (BackedEnum $case) => $case->isOdd(), fn (BackedEnum $case) => $case->name); // ['one' => true, 
+BackedEnum::filter('isOdd'); // CasesCollection<BackedEnum::one, BackedEnum::three>
+BackedEnum::filter(fn (BackedEnum $case) => $case->isOdd()); // CasesCollection<BackedEnum::one, BackedEnum::three>
+BackedEnum::only('two', 'three'); // CasesCollection<BackedEnum::two, BackedEnum::three>
+BackedEnum::except('two', 'three'); // CasesCollection<BackedEnum::one>
+BackedEnum::onlyValues(2, 3); // CasesCollection<>
+BackedEnum::exceptValues(2, 3); // CasesCollection<>'two' => false, 'three' => true]
+BackedEnum::sort(); // CasesCollection<BackedEnum::one, BackedEnum::three, BackedEnum::two>
+BackedEnum::sortDesc(); // CasesCollection<BackedEnum::two, BackedEnum::three, BackedEnum::one>
+BackedEnum::sortByValue(); // CasesCollection<BackedEnum::one, BackedEnum::two, BackedEnum::three>
+BackedEnum::sortDescByValue(); // CasesCollection<BackedEnum::three, BackedEnum::two, BackedEnum::one>
+BackedEnum::sortBy('color'); // CasesCollection<BackedEnum::three, BackedEnum::two, BackedEnum::one>
+BackedEnum::sortDescBy(fn (BackedEnum $case) => $case->color()); // CasesCollection<BackedEnum::one, BackedEnum::two, BackedEnum::three>
+```
+
+
+### Cases collection
+
+When a plain list of cases is returned by one of the [cases operations](#elaborating-cases), it gets wrapped into a `CasesCollection` which provides a fluent API to perform further operations on the set of cases:
+
+```php
+PureEnum::filter('isOdd')->sortBy('color')->pluck('color', 'name'); // ['three' => 'blue', 'one' => 'red']
+```
+
+Cases can be collected by calling `collect()` or any other [cases operation](#elaborating-cases) returning a `CasesCollection`:
+
+```php
+PureEnum::collect(); // CasesCollection<PureEnum::one, PureEnum::two, PureEnum::three>
+
+BackedEnum::only('one', 'two'); // CasesCollection<BackedEnum::one, BackedEnum::two>
+```
+
+We can iterate cases collections within any loop:
+
+```php
+foreach (PureEnum::collect() as $case) {
+    echo $case->name;
+}
+```
+
+Obtaining the underlying plain list of cases is easy:
+
+```php
+PureEnum::collect()->cases(); // [PureEnum::one, PureEnum::two, PureEnum::three]
+```
+
+Sometimes we may need to extract only the first case of the collection:
+
+```php
+PureEnum::filter(fn (PureEnum $case) => !$case->isOdd())->first(); // PureEnum::two
+```
+
+For reference, here are all the operations available in `CasesCollection`:
+
+```php
+PureEnum::collect()->cases(); // [PureEnum::one, PureEnum::two, PureEnum::three]
+PureEnum::collect()->count(); // 3
+PureEnum::collect()->first(); // PureEnum::one
+PureEnum::collect()->keyByName(); // ['one' => PureEnum::one, 'two' => PureEnum::two, 'three' => PureEnum::three]
+PureEnum::collect()->keyByValue(); // []
+PureEnum::collect()->keyBy('color'); // ['red' => PureEnum::one, 'green' => PureEnum::two, 'blue' => PureEnum::three]
+PureEnum::collect()->groupBy('color'); // ['red' => [PureEnum::one], 'green' => [PureEnum::two], 'blue' => [PureEnum::three]]
+PureEnum::collect()->names(); // ['one', 'two', 'three']
+PureEnum::collect()->values(); // []
+PureEnum::collect()->pluck(); // ['one', 'two', 'three']
+PureEnum::collect()->pluck('color'); // ['red', 'green', 'blue']
+PureEnum::collect()->pluck(fn (PureEnum $case) => $case->isOdd()); // [true, false, true]
+PureEnum::collect()->pluck('color', 'shape'); // ['triangle' => 'red', 'square' => 'green', 'circle' => 'blue']
+PureEnum::collect()->pluck(fn (PureEnum $case) => $case->isOdd(), fn (PureEnum $case) => $case->name); // ['one' => true, 'two' => false, 'three' => true]
+PureEnum::collect()->filter('isOdd'); // CasesCollection<PureEnum::one, PureEnum::three>
+PureEnum::collect()->filter(fn (PureEnum $case) => $case->isOdd()); // CasesCollection<PureEnum::one, PureEnum::three>
+PureEnum::collect()->only('two', 'three'); // CasesCollection<PureEnum::two, PureEnum::three>
+PureEnum::collect()->except('two', 'three'); // CasesCollection<PureEnum::one>
+PureEnum::collect()->onlyValues(2, 3); // CasesCollection<>
+PureEnum::collect()->exceptValues(2, 3); // CasesCollection<>
+PureEnum::collect()->sort(); // CasesCollection<PureEnum::one, PureEnum::three, PureEnum::two>
+PureEnum::collect()->sortDesc(); // CasesCollection<PureEnum::two, PureEnum::three, PureEnum::one>
+PureEnum::collect()->sortByValue(); // CasesCollection<>
+PureEnum::collect()->sortDescByValue(); // CasesCollection<>
+PureEnum::collect()->sortBy('color'); // CasesCollection<PureEnum::three, PureEnum::two, PureEnum::one>
+PureEnum::collect()->sortDescBy(fn (PureEnum $case) => $case->color()); // CasesCollection<PureEnum::one, PureEnum::two, PureEnum::three>
+
+BackedEnum::collect()->cases(); // [BackedEnum::one, BackedEnum::two, BackedEnum::three]
+BackedEnum::collect()->count(); // 3
+BackedEnum::collect()->first(); // BackedEnum::one
+BackedEnum::collect()->keyByName(); // ['one' => BackedEnum::one, 'two' => BackedEnum::two, 'three' => BackedEnum::three]
+BackedEnum::collect()->keyByValue(); // [1 => BackedEnum::one, 2 => BackedEnum::two, 3 => BackedEnum::three]
+BackedEnum::collect()->keyBy('color'); // ['red' => BackedEnum::one, 'green' => BackedEnum::two, 'blue' => BackedEnum::three]
+BackedEnum::collect()->groupBy('color'); // ['red' => [BackedEnum::one], 'green' => [BackedEnum::two], 'blue' => [BackedEnum::three]]
+BackedEnum::collect()->names(); // ['one', 'two', 'three']
+BackedEnum::collect()->values(); // [1, 2, 3]
+BackedEnum::collect()->pluck(); // [1, 2, 3]
+BackedEnum::collect()->pluck('color'); // ['red', 'green', 'blue']
+BackedEnum::collect()->pluck(fn (BackedEnum $case) => $case->isOdd()); // [true, false, true]
+BackedEnum::collect()->pluck('color', 'shape'); // ['triangle' => 'red', 'square' => 'green', 'circle' => 'blue']
+BackedEnum::collect()->pluck(fn (BackedEnum $case) => $case->isOdd(), fn (BackedEnum $case) => $case->name); // ['one' => true, 'two' => false, 'three' => true]
+BackedEnum::collect()->filter('isOdd'); // CasesCollection<BackedEnum::one, BackedEnum::three>
+BackedEnum::collect()->filter(fn (BackedEnum $case) => $case->isOdd()); // CasesCollection<BackedEnum::one, BackedEnum::three>
+BackedEnum::collect()->only('two', 'three'); // CasesCollection<BackedEnum::two, BackedEnum::three>
+BackedEnum::collect()->except('two', 'three'); // CasesCollection<BackedEnum::one>
+BackedEnum::collect()->onlyValues(2, 3); // CasesCollection<BackedEnum::two, BackedEnum::three>
+BackedEnum::collect()->exceptValues(2, 3); // CasesCollection<BackedEnum::one>
+BackedEnum::collect()->sort(); // CasesCollection<BackedEnum::one, BackedEnum::three, BackedEnum::two>
+BackedEnum::collect()->sortDesc(); // CasesCollection<BackedEnum::two, BackedEnum::three, BackedEnum::one>
+BackedEnum::collect()->sortByValue(); // CasesCollection<BackedEnum::one, BackedEnum::two, BackedEnum::three>
+BackedEnum::collect()->sortDescByValue(); // CasesCollection<BackedEnum::three, BackedEnum::two, BackedEnum::one>
+BackedEnum::collect()->sortBy('color'); // CasesCollection<BackedEnum::three, BackedEnum::two, BackedEnum::one>
+BackedEnum::collect()->sortDescBy(fn (BackedEnum $case) => $case->color()); // CasesCollection<BackedEnum::one, BackedEnum::two, BackedEnum::three>
 ```
 
 ## 📆 Change log
