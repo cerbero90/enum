@@ -49,7 +49,7 @@ enum BackedEnum: int
      *
      * @return bool
      */
-    public function odd(): bool
+    public function isOdd(): bool
     {
         return match ($this) {
             static::one => true,
