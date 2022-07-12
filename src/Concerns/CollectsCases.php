@@ -21,9 +21,19 @@ trait CollectsCases
     }
 
     /**
+     * Retrieve the count of cases
+     *
+     * @return int
+     */
+    public static function count(): int
+    {
+        return static::collect()->count();
+    }
+
+    /**
      * Retrieve all cases keyed by name
      *
-     * @return array<string, \UnitEnum>
+     * @return array<string, mixed>
      */
     public static function casesByName(): array
     {
@@ -33,7 +43,7 @@ trait CollectsCases
     /**
      * Retrieve all cases keyed by value
      *
-     * @return array<string|int, \BackedEnum>
+     * @return array<string|int, mixed>
      */
     public static function casesByValue(): array
     {
@@ -44,7 +54,7 @@ trait CollectsCases
      * Retrieve all cases keyed by the given key
      *
      * @param callable|string $key
-     * @return array<mixed, \UnitEnum>
+     * @return array
      */
     public static function casesBy(callable|string $key): array
     {
@@ -52,9 +62,20 @@ trait CollectsCases
     }
 
     /**
+     * Retrieve all cases grouped by the given key
+     *
+     * @param callable|string $key
+     * @return array
+     */
+    public static function groupBy(callable|string $key): array
+    {
+        return static::collect()->groupBy($key);
+    }
+
+    /**
      * Retrieve all the names of the cases
      *
-     * @return array
+     * @return array<int, string>
      */
     public static function names(): array
     {
@@ -64,7 +85,7 @@ trait CollectsCases
     /**
      * Retrieve all the values of the backed cases
      *
-     * @return array
+     * @return array<int, mixed>
      */
     public static function values(): array
     {
@@ -75,7 +96,7 @@ trait CollectsCases
      * Retrieve all the keys of the backed cases
      *
      * @param callable|string $key
-     * @return array
+     * @return array<int, mixed>
      */
     public static function keys(callable|string $key): array
     {
@@ -209,15 +230,5 @@ trait CollectsCases
     public static function sortDescBy(callable|string $key): CasesCollection
     {
         return static::collect()->sortDescBy($key);
-    }
-
-    /**
-     * Retrieve the count of cases
-     *
-     * @return int
-     */
-    public static function count(): int
-    {
-        return static::collect()->count();
     }
 }

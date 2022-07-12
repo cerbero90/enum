@@ -69,9 +69,10 @@ class CasesCollection implements Countable, IteratorAggregate
      * Retrieve the first case
      *
      * @param callable|null $callback
+     * @param mixed $default
      * @return mixed
      */
-    public function first(callable $callback = null): mixed
+    public function first(callable $callback = null, mixed $default = null): mixed
     {
         $callback ??= fn () => true;
 
@@ -81,7 +82,7 @@ class CasesCollection implements Countable, IteratorAggregate
             }
         }
 
-        return null;
+        return $default;
     }
 
     /**
@@ -119,6 +120,23 @@ class CasesCollection implements Countable, IteratorAggregate
     public function keyByValue(): array
     {
         return $this->enumIsBacked ? $this->keyBy('value') : [];
+    }
+
+    /**
+     * Retrieve the cases grouped by the given key
+     *
+     * @param callable|string $key
+     * @return array<string, mixed>
+     */
+    public function groupBy(callable|string $key): array
+    {
+        $result = [];
+
+        foreach ($this->cases as $case) {
+            $result[$case->get($key)][] = $case;
+        }
+
+        return $result;
     }
 
     /**

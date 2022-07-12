@@ -37,6 +37,16 @@ it('retrieves all cases keyed by the result of a closure', function () {
         ->toBe(['triangle' => PureEnum::one, 'square' => PureEnum::two, 'circle' => PureEnum::three]);
 });
 
+it('retrieves all cases grouped by a custom key', function () {
+    expect(PureEnum::groupBy('color'))
+        ->toBe(['red' => [PureEnum::one], 'green' => [PureEnum::two], 'blue' => [PureEnum::three]]);
+});
+
+it('retrieves all cases grouped by the result of a closure', function () {
+    expect(PureEnum::groupBy(fn (PureEnum $case) => $case->isOdd()))
+        ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
+});
+
 it('retrieves all the names of the cases', function () {
     expect(PureEnum::names())->toBe(['one', 'two', 'three']);
 });
@@ -305,7 +315,7 @@ it('retrieves the cases hydrated from a key')
     ->with([
         ['color', 'red', [PureEnum::one]],
         ['name', 'three', [PureEnum::three]],
-        ['odd', true, [PureEnum::one, PureEnum::three]],
+        ['isOdd', true, [PureEnum::one, PureEnum::three]],
     ]);
 
 it('retrieves the cases hydrated from a key using a closure')
@@ -324,7 +334,7 @@ it('retrieves the case hydrated from a key or returns null')
     ->with([
         ['color', 'red', [PureEnum::one]],
         ['name', 'three', [PureEnum::three]],
-        ['odd', true, [PureEnum::one, PureEnum::three]],
+        ['isOdd', true, [PureEnum::one, PureEnum::three]],
         ['shape', 'rectangle', null],
     ]);
 

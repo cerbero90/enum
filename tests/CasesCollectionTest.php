@@ -21,13 +21,18 @@ it('retrieves the first case')
 
 it('retrieves the first case with a closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->first(fn (PureEnum $case) => !$case->odd())
+    ->first(fn (PureEnum $case) => !$case->isOdd())
     ->toBe(PureEnum::two);
 
 it('returns null if no case is present')
     ->expect(new CasesCollection([]))
     ->first()
     ->toBeNull();
+
+it('returns a default value if no case is present')
+    ->expect(new CasesCollection([]))
+    ->first(default: PureEnum::one)
+    ->toBe(PureEnum::one);
 
 it('retrieves the cases keyed by name')
     ->expect(new CasesCollection(PureEnum::cases()))
@@ -53,6 +58,16 @@ it('retrieves an empty array when trying to key cases by value belonging to a pu
     ->expect(new CasesCollection(PureEnum::cases()))
     ->keyByValue()
     ->toBeEmpty();
+
+it('retrieves the cases grouped by a custom key')
+    ->expect(new CasesCollection(PureEnum::cases()))
+    ->groupBy('color')
+    ->toBe(['red' => [PureEnum::one], 'green' => [PureEnum::two], 'blue' => [PureEnum::three]]);
+
+it('retrieves the cases grouped by a custom closure')
+    ->expect(new CasesCollection(PureEnum::cases()))
+    ->groupBy(fn (PureEnum $case) => $case->isOdd())
+    ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
 
 it('retrieves all the names of the cases')
     ->expect(new CasesCollection(PureEnum::cases()))
@@ -110,7 +125,7 @@ it('retrieves an associative array with custom values and keys when plucking wit
     ->toBe(['red' => 'triangle', 'green' => 'square', 'blue' => 'circle']);
 
 it('retrieves a collection with filtered cases', function () {
-    expect((new CasesCollection(PureEnum::cases()))->filter(fn (PureEnum $case) => $case->odd()))
+    expect((new CasesCollection(PureEnum::cases()))->filter(fn (PureEnum $case) => $case->isOdd()))
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([PureEnum::one, PureEnum::three]);

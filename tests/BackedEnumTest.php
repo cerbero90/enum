@@ -52,6 +52,16 @@ it('retrieves all cases keyed by the result of a closure')
     ->expect(BackedEnum::casesBy(fn (BackedEnum $case) => $case->shape()))
     ->toBe(['triangle' => BackedEnum::one, 'square' => BackedEnum::two, 'circle' => BackedEnum::three]);
 
+it('retrieves all cases grouped by a custom key', function () {
+    expect(BackedEnum::groupBy('color'))
+        ->toBe(['red' => [BackedEnum::one], 'green' => [BackedEnum::two], 'blue' => [BackedEnum::three]]);
+});
+
+it('retrieves all cases grouped by the result of a closure', function () {
+    expect(BackedEnum::groupBy(fn (BackedEnum $case) => $case->isOdd()))
+        ->toBe([1 => [BackedEnum::one, BackedEnum::three], 0 => [BackedEnum::two]]);
+});
+
 it('retrieves a collection with the filtered cases')
     ->expect(BackedEnum::filter(fn (UnitEnum $case) => $case->name !== 'three'))
     ->toBeInstanceOf(CasesCollection::class)
@@ -286,7 +296,7 @@ it('retrieves the cases hydrated from a key')
     ->with([
         ['color', 'red', [BackedEnum::one]],
         ['name', 'three', [BackedEnum::three]],
-        ['odd', true, [BackedEnum::one, BackedEnum::three]],
+        ['isOdd', true, [BackedEnum::one, BackedEnum::three]],
     ]);
 
 it('retrieves the cases hydrated from a key using a closure')
@@ -305,7 +315,7 @@ it('retrieves the case hydrated from a key or returns null')
     ->with([
         ['color', 'red', [BackedEnum::one]],
         ['name', 'three', [BackedEnum::three]],
-        ['odd', true, [BackedEnum::one, BackedEnum::three]],
+        ['isOdd', true, [BackedEnum::one, BackedEnum::three]],
         ['shape', 'rectangle', null],
     ]);
 
