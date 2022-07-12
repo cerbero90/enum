@@ -160,17 +160,6 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve all the keys of the cases
-     *
-     * @param callable|string $key
-     * @return array
-     */
-    public function keys(callable|string $key): array
-    {
-        return $this->pluck($key);
-    }
-
-    /**
      * Retrieve an array of values optionally keyed by the given key
      *
      * @param callable|string|null $value

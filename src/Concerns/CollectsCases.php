@@ -93,17 +93,6 @@ trait CollectsCases
     }
 
     /**
-     * Retrieve all the keys of the backed cases
-     *
-     * @param callable|string $key
-     * @return array<int, mixed>
-     */
-    public static function keys(callable|string $key): array
-    {
-        return static::collect()->keys($key);
-    }
-
-    /**
      * Retrieve a collection with the filtered cases
      *
      * @param callable $callback

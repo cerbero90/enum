@@ -84,16 +84,6 @@ it('retrieves an empty array when trying to retrieve values belonging to a pure 
     ->values()
     ->toBeEmpty();
 
-it('retrieves all the values of a particular key for all cases')
-    ->expect(new CasesCollection(PureEnum::cases()))
-    ->keys('color')
-    ->toBe(['red', 'green', 'blue']);
-
-it('retrieves all the values of a particular key for all cases with a closure')
-    ->expect(new CasesCollection(PureEnum::cases()))
-    ->keys(fn (PureEnum $case) => $case->shape())
-    ->toBe(['triangle', 'square', 'circle']);
-
 it('retrieves a list of names by default when plucking a pure enum')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->pluck()

@@ -55,17 +55,6 @@ it('retrieves all the values of the backed cases', function () {
     expect(PureEnum::values())->toBeEmpty();
 });
 
-it('retrieves all the keys of the cases')
-    ->expect(PureEnum::keys('color'))
-    ->toBe(['red', 'green', 'blue']);
-
-it('retrieves all the keys of the cases with a closure')
-    ->expect(PureEnum::keys(fn (PureEnum $case) => $case->shape()))
-    ->toBe(['triangle', 'square', 'circle']);
-
-it('throws a value error when requesting an invalid key', fn () => PureEnum::keys('invalid'))
-    ->throws(ValueError::class, '"invalid" is not a valid key for enum "Cerbero\Enum\PureEnum"');
-
 it('retrieves a collection with the filtered cases', function () {
     expect(PureEnum::filter(fn (UnitEnum $case) => $case->name !== 'three'))
         ->toBeInstanceOf(CasesCollection::class)
