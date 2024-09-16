@@ -194,9 +194,9 @@ trait CollectsCases
      *
      * @return CasesCollection
      */
-    public static function sortDescByValue(): CasesCollection
+    public static function sortByDescValue(): CasesCollection
     {
-        return static::collect()->sortDescByValue();
+        return static::collect()->sortByDescValue();
     }
 
     /**
@@ -216,8 +216,8 @@ trait CollectsCases
      * @param callable|string $key
      * @return CasesCollection
      */
-    public static function sortDescBy(callable|string $key): CasesCollection
+    public static function sortByDesc(callable|string $key): CasesCollection
     {
-        return static::collect()->sortDescBy($key);
+        return static::collect()->sortByDesc($key);
     }
 }
