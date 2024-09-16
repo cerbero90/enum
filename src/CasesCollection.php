@@ -11,44 +11,42 @@ use UnitEnum;
 /**
  * The collection of enum cases.
  *
+ * @template TKey of array-key
+ * @template-covariant TValue of UnitEnum|BackedEnum
+ *
+ * @implements IteratorAggregate<TKey, TValue>
  */
 class CasesCollection implements Countable, IteratorAggregate
 {
     /**
-     * Whether the cases belong to a backed enum
-     *
-     * @var bool
+     * Whether the cases belong to a backed enum.
      */
-    protected bool $enumIsBacked;
+    protected readonly bool $enumIsBacked;
 
     /**
-     * Instantiate the class
+     * Instantiate the class.
      *
-     * @param array $cases
+     * @param array<TKey, TValue> $cases
      */
-    public function __construct(protected array $cases)
+    final public function __construct(protected array $cases)
     {
         $this->enumIsBacked = $this->first() instanceof BackedEnum;
     }
 
     /**
-     * Retrieve the iterable cases
+     * Retrieve the iterable cases.
      *
-     * @return Traversable
+     * @return Traversable<TKey, TValue>
      */
     public function getIterator(): Traversable
     {
-        return (function () {
-            foreach ($this->cases as $case) {
-                yield $case;
-            }
-        })();
+        yield from $this->cases;
     }
 
     /**
-     * Retrieve the cases
+     * Retrieve the cases.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function cases(): array
     {
@@ -56,9 +54,7 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the count of cases
-     *
-     * @return int
+     * Retrieve the count of cases.
      */
     public function count(): int
     {
@@ -66,18 +62,20 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the first case
+     * Retrieve the first case.
      *
-     * @param callable|null $callback
-     * @param mixed $default
-     * @return mixed
+     * @template TFirstDefault
+     *
+     * @param (callable(TValue, TKey): bool)|null $callback
+     * @param TFirstDefault $default
+     * @return TValue|TFirstDefault
      */
     public function first(callable $callback = null, mixed $default = null): mixed
     {
         $callback ??= fn() => true;
 
-        foreach ($this->cases as $case) {
-            if ($callback($case)) {
+        foreach ($this->cases as $key => $case) {
+            if ($callback($case, $key)) {
                 return $case;
             }
         }
@@ -86,9 +84,9 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the cases keyed by name
+     * Retrieve the cases keyed by their own name.
      *
-     * @return array<string, mixed>
+     * @return array<string, TValue>
      */
     public function keyByName(): array
     {
@@ -96,26 +94,26 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the cases keyed by the given key
+     * Retrieve the cases keyed by the given key.
      *
-     * @param callable|string $key
-     * @return array<string, mixed>
+     * @param (callable(TValue): array-key)|string $key
+     * @return array<array-key, TValue>
      */
     public function keyBy(callable|string $key): array
     {
         $result = [];
 
         foreach ($this->cases as $case) {
-            $result[$case->get($key)] = $case;
+            $result[$case->get($key)] = $case; // @phpstan-ignore method.notFound
         }
 
         return $result;
     }
 
     /**
-     * Retrieve the cases keyed by value
+     * Retrieve the cases keyed by their own value.
      *
-     * @return array<string, mixed>
+     * @return array<string|int, TValue>
      */
     public function keyByValue(): array
     {
@@ -123,26 +121,26 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the cases grouped by the given key
+     * Retrieve the cases grouped by the given key.
      *
-     * @param callable|string $key
-     * @return array<string, mixed>
+     * @param (callable(TValue): array-key)|string $key
+     * @return array<array-key, TValue[]>
      */
     public function groupBy(callable|string $key): array
     {
         $result = [];
 
         foreach ($this->cases as $case) {
-            $result[$case->get($key)][] = $case;
+            $result[$case->get($key)][] = $case; // @phpstan-ignore method.notFound
         }
 
         return $result;
     }
 
     /**
-     * Retrieve all the names of the cases
+     * Retrieve all the names of the cases.
      *
-     * @return array<int, string>
+     * @return string[]
      */
     public function names(): array
     {
@@ -150,9 +148,9 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve all the values of the backed cases
+     * Retrieve all the values of the backed cases.
      *
-     * @return array<int, string|int>
+     * @return list<string|int>
      */
     public function values(): array
     {
@@ -160,11 +158,13 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve an array of values optionally keyed by the given key
+     * Retrieve an array of values optionally keyed by the given key.
      *
-     * @param callable|string|null $value
-     * @param callable|string|null $key
-     * @return array
+     * @template TPluckValue
+     *
+     * @param (callable(TValue): array-key)|string|null $value
+     * @param (callable(TValue): TPluckValue)|string|null $key
+     * @return array<array-key, TPluckValue>
      */
     public function pluck(callable|string $value = null, callable|string $key = null): array
     {
@@ -173,9 +173,9 @@ class CasesCollection implements Countable, IteratorAggregate
 
         foreach ($this->cases as $case) {
             if ($key === null) {
-                $result[] = $case->get($value);
+                $result[] = $case->get($value); // @phpstan-ignore method.notFound
             } else {
-                $result[$case->get($key)] = $case->get($value);
+                $result[$case->get($key)] = $case->get($value); // @phpstan-ignore-line
             }
         }
 
@@ -183,24 +183,20 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve a collection with the filtered cases
+     * Retrieve a new collection with the filtered cases.
      *
-     * @param callable|string $filter
-     * @return static
+     * @param (callable(TValue): bool)|string $filter
      */
     public function filter(callable|string $filter): static
     {
+        // @phpstan-ignore-next-line
         $callback = is_callable($filter) ? $filter : fn(mixed $case) => $case->get($filter) === true;
-        $cases = array_filter($this->cases, $callback);
 
-        return new static(array_values($cases));
+        return new static(array_filter($this->cases, $callback));
     }
 
     /**
-     * Retrieve a collection of cases having the given names
-     *
-     * @param string ...$name
-     * @return static
+     * Retrieve a new collection of cases having only the given names.
      */
     public function only(string ...$name): static
     {
@@ -208,10 +204,7 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve a collection of cases not having the given names
-     *
-     * @param string ...$name
-     * @return static
+     * Retrieve a collection of cases not having the given names.
      */
     public function except(string ...$name): static
     {
@@ -219,31 +212,29 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve a collection of backed cases having the given values
-     *
-     * @param string|int ...$value
-     * @return static
+     * Retrieve a new collection of backed cases having only the given values.
      */
     public function onlyValues(string|int ...$value): static
     {
-        return $this->filter(fn(UnitEnum $case) => $this->enumIsBacked && in_array($case->value, $value, true));
+        return $this->filter(function (UnitEnum $case) use ($value) {
+            /** @var BackedEnum $case */
+            return $this->enumIsBacked && in_array($case->value, $value, true);
+        });
     }
 
     /**
-     * Retrieve a collection of backed cases not having the given values
-     *
-     * @param string|int ...$value
-     * @return static
+     * Retrieve a new collection of backed cases not having the given values.
      */
     public function exceptValues(string|int ...$value): static
     {
-        return $this->filter(fn(UnitEnum $case) => $this->enumIsBacked && !in_array($case->value, $value, true));
+        return $this->filter(function (UnitEnum $case) use ($value) {
+            /** @var BackedEnum $case */
+            return $this->enumIsBacked && !in_array($case->value, $value, true);
+        });
     }
 
     /**
-     * Retrieve a collection of cases sorted by name ascending
-     *
-     * @return static
+     * Retrieve a new collection of cases sorted by their own name ascending.
      */
     public function sort(): static
     {
@@ -251,49 +242,43 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve a collection of cases sorted by name descending
+     * Retrieve a new collection of cases sorted by the given key ascending.
      *
-     * @return static
-     */
-    public function sortDesc(): static
-    {
-        return $this->sortDescBy('name');
-    }
-
-    /**
-     * Retrieve a collection of cases sorted by the given key ascending
-     *
-     * @param callable|string $key
-     * @return static
+     * @param (callable(TValue): mixed)|string $key
      */
     public function sortBy(callable|string $key): static
     {
         $cases = $this->cases;
 
-        usort($cases, fn($a, $b) => $a->get($key) <=> $b->get($key));
+        uasort($cases, fn(mixed $a, mixed $b) => $a->get($key) <=> $b->get($key)); // @phpstan-ignore-line
 
         return new static($cases);
     }
 
     /**
-     * Retrieve a collection of cases sorted by the given key descending
-     *
-     * @param callable|string $key
-     * @return static
+     * Retrieve a new collection of cases sorted by their own name descending.
      */
-    public function sortDescBy(callable|string $key): static
+    public function sortDesc(): static
+    {
+        return $this->sortByDesc('name');
+    }
+
+    /**
+     * Retrieve a new collection of cases sorted by the given key descending.
+     *
+     * @param (callable(TValue): mixed)|string $key
+     */
+    public function sortByDesc(callable|string $key): static
     {
         $cases = $this->cases;
 
-        usort($cases, fn($a, $b) => $a->get($key) > $b->get($key) ? -1 : 1);
+        uasort($cases, fn(mixed $a, mixed $b) => $a->get($key) > $b->get($key) ? -1 : 1); // @phpstan-ignore-line
 
         return new static($cases);
     }
 
     /**
-     * Retrieve a collection of cases sorted by value ascending
-     *
-     * @return static
+     * Retrieve a new collection of cases sorted by their own value ascending.
      */
     public function sortByValue(): static
     {
@@ -301,12 +286,10 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve a collection of cases sorted by value descending
-     *
-     * @return static
+     * Retrieve a new collection of cases sorted by their own value descending.
      */
-    public function sortDescByValue(): static
+    public function sortByDescValue(): static
     {
-        return $this->enumIsBacked ? $this->sortDescBy('value') : new static([]);
+        return $this->enumIsBacked ? $this->sortByDesc('value') : new static([]);
     }
 }
