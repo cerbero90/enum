@@ -23,7 +23,7 @@ trait KeysAware
         try {
             return is_callable($key) ? $key($this) : ($this->$key ?? $this->$key());
         } catch (Throwable) {
-            $target = is_callable($key) ? 'The given callable' : "\"$key\"";
+            $target = is_callable($key) ? 'The given callable' : "\"{$key}\"";
             throw new ValueError(sprintf('%s is not a valid key for enum "%s"', $target, static::class));
         }
     }

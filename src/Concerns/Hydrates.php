@@ -81,7 +81,7 @@ trait Hydrates
             return $result;
         }
 
-        $target = is_callable($key) ? 'given callable key' : "key \"$key\"";
+        $target = is_callable($key) ? 'given callable key' : "key \"{$key}\"";
 
         throw new ValueError(sprintf('Invalid value for the %s for enum "%s"', $target, static::class));
     }

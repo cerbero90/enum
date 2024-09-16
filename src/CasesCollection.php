@@ -74,7 +74,7 @@ class CasesCollection implements Countable, IteratorAggregate
      */
     public function first(callable $callback = null, mixed $default = null): mixed
     {
-        $callback ??= fn () => true;
+        $callback ??= fn() => true;
 
         foreach ($this->cases as $case) {
             if ($callback($case)) {
@@ -190,7 +190,7 @@ class CasesCollection implements Countable, IteratorAggregate
      */
     public function filter(callable|string $filter): static
     {
-        $callback = is_callable($filter) ? $filter : fn (mixed $case) => $case->get($filter) === true;
+        $callback = is_callable($filter) ? $filter : fn(mixed $case) => $case->get($filter) === true;
         $cases = array_filter($this->cases, $callback);
 
         return new static(array_values($cases));
@@ -204,7 +204,7 @@ class CasesCollection implements Countable, IteratorAggregate
      */
     public function only(string ...$name): static
     {
-        return $this->filter(fn (UnitEnum $case) => in_array($case->name, $name));
+        return $this->filter(fn(UnitEnum $case) => in_array($case->name, $name));
     }
 
     /**
@@ -215,7 +215,7 @@ class CasesCollection implements Countable, IteratorAggregate
      */
     public function except(string ...$name): static
     {
-        return $this->filter(fn (UnitEnum $case) => !in_array($case->name, $name));
+        return $this->filter(fn(UnitEnum $case) => !in_array($case->name, $name));
     }
 
     /**
@@ -226,7 +226,7 @@ class CasesCollection implements Countable, IteratorAggregate
      */
     public function onlyValues(string|int ...$value): static
     {
-        return $this->filter(fn (UnitEnum $case) => $this->enumIsBacked && in_array($case->value, $value, true));
+        return $this->filter(fn(UnitEnum $case) => $this->enumIsBacked && in_array($case->value, $value, true));
     }
 
     /**
@@ -237,7 +237,7 @@ class CasesCollection implements Countable, IteratorAggregate
      */
     public function exceptValues(string|int ...$value): static
     {
-        return $this->filter(fn (UnitEnum $case) => $this->enumIsBacked && !in_array($case->value, $value, true));
+        return $this->filter(fn(UnitEnum $case) => $this->enumIsBacked && !in_array($case->value, $value, true));
     }
 
     /**
@@ -270,7 +270,7 @@ class CasesCollection implements Countable, IteratorAggregate
     {
         $cases = $this->cases;
 
-        usort($cases, fn ($a, $b) => $a->get($key) <=> $b->get($key));
+        usort($cases, fn($a, $b) => $a->get($key) <=> $b->get($key));
 
         return new static($cases);
     }
@@ -285,7 +285,7 @@ class CasesCollection implements Countable, IteratorAggregate
     {
         $cases = $this->cases;
 
-        usort($cases, fn ($a, $b) => $a->get($key) > $b->get($key) ? -1 : 1);
+        usort($cases, fn($a, $b) => $a->get($key) > $b->get($key) ? -1 : 1);
 
         return new static($cases);
     }
