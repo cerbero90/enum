@@ -38,7 +38,7 @@ it('retrieves all cases keyed by a custom key')
     ->toBe(['red' => BackedEnum::one, 'green' => BackedEnum::two, 'blue' => BackedEnum::three]);
 
 it('retrieves all cases keyed by the result of a closure')
-    ->expect(BackedEnum::casesBy(fn (BackedEnum $case) => $case->shape()))
+    ->expect(BackedEnum::casesBy(fn(BackedEnum $case) => $case->shape()))
     ->toBe(['triangle' => BackedEnum::one, 'square' => BackedEnum::two, 'circle' => BackedEnum::three]);
 
 it('retrieves all cases grouped by a custom key', function () {
@@ -47,12 +47,12 @@ it('retrieves all cases grouped by a custom key', function () {
 });
 
 it('retrieves all cases grouped by the result of a closure', function () {
-    expect(BackedEnum::groupBy(fn (BackedEnum $case) => $case->isOdd()))
+    expect(BackedEnum::groupBy(fn(BackedEnum $case) => $case->isOdd()))
         ->toBe([1 => [BackedEnum::one, BackedEnum::three], 0 => [BackedEnum::two]]);
 });
 
 it('retrieves a collection with the filtered cases')
-    ->expect(BackedEnum::filter(fn (UnitEnum $case) => $case->name !== 'three'))
+    ->expect(BackedEnum::filter(fn(UnitEnum $case) => $case->name !== 'three'))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([BackedEnum::one, BackedEnum::two]);
@@ -101,11 +101,11 @@ it('retrieves an associative array with custom keys and values')
     ->toBe(['triangle' => 'red', 'square' => 'green', 'circle' => 'blue']);
 
 it('retrieves an associative array with keys and values resolved from closures')
-    ->expect(BackedEnum::pluck(fn (BackedEnum $case) => $case->name, fn (BackedEnum $case) => $case->color()))
+    ->expect(BackedEnum::pluck(fn(BackedEnum $case) => $case->name, fn(BackedEnum $case) => $case->color()))
     ->toBe(['red' => 'one', 'green' => 'two', 'blue' => 'three']);
 
 it('determines whether an enum has a target')
-    ->expect(fn (mixed $target, bool $result) => BackedEnum::has($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => BackedEnum::has($target) === $result)
     ->toBeTrue()
     ->with([
         [BackedEnum::one, true],
@@ -119,7 +119,7 @@ it('determines whether an enum has a target')
     ]);
 
 it('determines whether an enum does not have a target')
-    ->expect(fn (mixed $target, bool $result) => BackedEnum::doesntHave($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => BackedEnum::doesntHave($target) === $result)
     ->toBeTrue()
     ->with([
         [BackedEnum::one, false],
@@ -133,7 +133,7 @@ it('determines whether an enum does not have a target')
     ]);
 
 it('determines whether an enum case matches a target')
-    ->expect(fn (mixed $target, bool $result) => BackedEnum::one->is($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => BackedEnum::one->is($target) === $result)
     ->toBeTrue()
     ->with([
         [BackedEnum::one, true],
@@ -147,7 +147,7 @@ it('determines whether an enum case matches a target')
     ]);
 
 it('determines whether an enum case does not match a target')
-    ->expect(fn (mixed $target, bool $result) => BackedEnum::one->isNot($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => BackedEnum::one->isNot($target) === $result)
     ->toBeTrue()
     ->with([
         [BackedEnum::one, false],
@@ -161,7 +161,7 @@ it('determines whether an enum case does not match a target')
     ]);
 
 it('determines whether an enum case matches some targets')
-    ->expect(fn (mixed $targets, bool $result) => BackedEnum::one->in($targets) === $result)
+    ->expect(fn(mixed $targets, bool $result) => BackedEnum::one->in($targets) === $result)
     ->toBeTrue()
     ->with([
         [[BackedEnum::one, BackedEnum::two], true],
@@ -175,7 +175,7 @@ it('determines whether an enum case matches some targets')
     ]);
 
 it('determines whether an enum case does not match any target')
-    ->expect(fn (mixed $targets, bool $result) => BackedEnum::one->notIn($targets) === $result)
+    ->expect(fn(mixed $targets, bool $result) => BackedEnum::one->notIn($targets) === $result)
     ->toBeTrue()
     ->with([
         [[BackedEnum::one, BackedEnum::two], false],
@@ -207,7 +207,7 @@ it('retrieves a collection of cases sorted by value ascending')
     ->toBe([BackedEnum::one, BackedEnum::two, BackedEnum::three]);
 
 it('retrieves a collection of cases sorted by value descending')
-    ->expect(BackedEnum::sortDescByValue())
+    ->expect(BackedEnum::sortByDescValue())
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([BackedEnum::three, BackedEnum::two, BackedEnum::one]);
@@ -219,19 +219,19 @@ it('retrieves a collection of cases sorted by a custom value ascending')
     ->toBe([BackedEnum::three, BackedEnum::two, BackedEnum::one]);
 
 it('retrieves a collection of cases sorted by a custom value descending')
-    ->expect(BackedEnum::sortDescBy('color'))
+    ->expect(BackedEnum::sortByDesc('color'))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([BackedEnum::one, BackedEnum::two, BackedEnum::three]);
 
 it('retrieves a collection of cases sorted by the result of a closure ascending')
-    ->expect(BackedEnum::sortBy(fn (BackedEnum $case) => $case->shape()))
+    ->expect(BackedEnum::sortBy(fn(BackedEnum $case) => $case->shape()))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([BackedEnum::three, BackedEnum::two, BackedEnum::one]);
 
 it('retrieves a collection of cases sorted by the result of a closure descending')
-    ->expect(BackedEnum::sortDescBy(fn (BackedEnum $case) => $case->shape()))
+    ->expect(BackedEnum::sortByDesc(fn(BackedEnum $case) => $case->shape()))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([BackedEnum::one, BackedEnum::two, BackedEnum::three]);
@@ -241,7 +241,7 @@ it('retrieves the count of cases')
     ->toBe(3);
 
 it('retrieves the case hydrated from a value')
-    ->expect(fn (int $value, BackedEnum $case) => BackedEnum::from($value) === $case)
+    ->expect(fn(int $value, BackedEnum $case) => BackedEnum::from($value) === $case)
     ->toBeTrue()
     ->with([
         [1, BackedEnum::one],
@@ -249,11 +249,11 @@ it('retrieves the case hydrated from a value')
         [3, BackedEnum::three],
     ]);
 
-it('throws a value error when hydrating backed cases with a missing value', fn () => BackedEnum::from(4))
+it('throws a value error when hydrating backed cases with a missing value', fn() => BackedEnum::from(4))
     ->throws(ValueError::class, '4 is not a valid backing value for enum "Cerbero\Enum\BackedEnum"');
 
 it('retrieves the case hydrated from a value or returns null')
-    ->expect(fn (int $value, ?BackedEnum $case) => BackedEnum::tryFrom($value) === $case)
+    ->expect(fn(int $value, ?BackedEnum $case) => BackedEnum::tryFrom($value) === $case)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
@@ -264,7 +264,7 @@ it('retrieves the case hydrated from a value or returns null')
     ]);
 
 it('retrieves the case hydrated from a name')
-    ->expect(fn (string $name, BackedEnum $case) => BackedEnum::fromName($name) === $case)
+    ->expect(fn(string $name, BackedEnum $case) => BackedEnum::fromName($name) === $case)
     ->toBeTrue()
     ->with([
         ['one', BackedEnum::one],
@@ -272,11 +272,11 @@ it('retrieves the case hydrated from a name')
         ['three', BackedEnum::three],
     ]);
 
-it('throws a value error when hydrating backed cases with a missing name', fn () => BackedEnum::fromName('four'))
+it('throws a value error when hydrating backed cases with a missing name', fn() => BackedEnum::fromName('four'))
     ->throws(ValueError::class, '"four" is not a valid name for enum "Cerbero\Enum\BackedEnum"');
 
 it('retrieves the case hydrated from a name or returns null')
-    ->expect(fn (string $name, ?BackedEnum $case) => BackedEnum::tryFromName($name) === $case)
+    ->expect(fn(string $name, ?BackedEnum $case) => BackedEnum::tryFromName($name) === $case)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
@@ -287,7 +287,7 @@ it('retrieves the case hydrated from a name or returns null')
     ]);
 
 it('retrieves the cases hydrated from a key')
-    ->expect(fn (string $key, mixed $value, array $cases) => BackedEnum::fromKey($key, $value)->cases() === $cases)
+    ->expect(fn(string $key, mixed $value, array $cases) => BackedEnum::fromKey($key, $value)->cases() === $cases)
     ->toBeTrue()
     ->with([
         ['color', 'red', [BackedEnum::one]],
@@ -296,16 +296,16 @@ it('retrieves the cases hydrated from a key')
     ]);
 
 it('retrieves the cases hydrated from a key using a closure')
-    ->expect(BackedEnum::fromKey(fn (BackedEnum $case) => $case->shape(), 'square'))
+    ->expect(BackedEnum::fromKey(fn(BackedEnum $case) => $case->shape(), 'square'))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([BackedEnum::two]);
 
-it('throws a value error when hydrating cases with an invalid key', fn () => BackedEnum::fromKey('color', 'orange'))
+it('throws a value error when hydrating cases with an invalid key', fn() => BackedEnum::fromKey('color', 'orange'))
     ->throws(ValueError::class, 'Invalid value for the key "color" for enum "Cerbero\Enum\BackedEnum"');
 
 it('retrieves the case hydrated from a key or returns null')
-    ->expect(fn (string $key, mixed $value, ?array $cases) => BackedEnum::tryFromKey($key, $value)?->cases() === $cases)
+    ->expect(fn(string $key, mixed $value, ?array $cases) => BackedEnum::tryFromKey($key, $value)?->cases() === $cases)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
@@ -316,13 +316,13 @@ it('retrieves the case hydrated from a key or returns null')
     ]);
 
 it('attempts to retrieve the case hydrated from a key using a closure')
-    ->expect(BackedEnum::tryFromKey(fn (BackedEnum $case) => $case->shape(), 'square'))
+    ->expect(BackedEnum::tryFromKey(fn(BackedEnum $case) => $case->shape(), 'square'))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([BackedEnum::two]);
 
 it('retrieves the key of a case')
-    ->expect(fn (string $key, mixed $value) => BackedEnum::one->get($key) === $value)
+    ->expect(fn(string $key, mixed $value) => BackedEnum::one->get($key) === $value)
     ->toBeTrue()
     ->with([
         ['name', 'one'],
@@ -332,8 +332,8 @@ it('retrieves the key of a case')
     ]);
 
 it('retrieves the key of a case using a closure')
-    ->expect(BackedEnum::one->get(fn (BackedEnum $case) => $case->color()))
+    ->expect(BackedEnum::one->get(fn(BackedEnum $case) => $case->color()))
     ->toBe('red');
 
-it('throws a value error when attempting to retrieve an invalid key', fn () => BackedEnum::one->get('invalid'))
+it('throws a value error when attempting to retrieve an invalid key', fn() => BackedEnum::one->get('invalid'))
     ->throws(ValueError::class, '"invalid" is not a valid key for enum "Cerbero\Enum\BackedEnum"');

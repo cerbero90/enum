@@ -33,7 +33,7 @@ it('retrieves all cases keyed by a custom key', function () {
 });
 
 it('retrieves all cases keyed by the result of a closure', function () {
-    expect(PureEnum::casesBy(fn (PureEnum $case) => $case->shape()))
+    expect(PureEnum::casesBy(fn(PureEnum $case) => $case->shape()))
         ->toBe(['triangle' => PureEnum::one, 'square' => PureEnum::two, 'circle' => PureEnum::three]);
 });
 
@@ -43,7 +43,7 @@ it('retrieves all cases grouped by a custom key', function () {
 });
 
 it('retrieves all cases grouped by the result of a closure', function () {
-    expect(PureEnum::groupBy(fn (PureEnum $case) => $case->isOdd()))
+    expect(PureEnum::groupBy(fn(PureEnum $case) => $case->isOdd()))
         ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
 });
 
@@ -56,7 +56,7 @@ it('retrieves all the values of the backed cases', function () {
 });
 
 it('retrieves a collection with the filtered cases', function () {
-    expect(PureEnum::filter(fn (UnitEnum $case) => $case->name !== 'three'))
+    expect(PureEnum::filter(fn(UnitEnum $case) => $case->name !== 'three'))
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([PureEnum::one, PureEnum::two]);
@@ -111,12 +111,12 @@ it('retrieves an associative array with custom keys and values', function () {
 });
 
 it('retrieves an associative array with keys and values resolved from closures', function () {
-    expect(PureEnum::pluck(fn (PureEnum $case) => $case->name, fn (PureEnum $case) => $case->color()))
+    expect(PureEnum::pluck(fn(PureEnum $case) => $case->name, fn(PureEnum $case) => $case->color()))
         ->toBe(['red' => 'one', 'green' => 'two', 'blue' => 'three']);
 });
 
 it('determines whether an enum has a target')
-    ->expect(fn (mixed $target, bool $result) => PureEnum::has($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => PureEnum::has($target) === $result)
     ->toBeTrue()
     ->with([
         [PureEnum::one, true],
@@ -130,7 +130,7 @@ it('determines whether an enum has a target')
     ]);
 
 it('determines whether an enum does not have a target')
-    ->expect(fn (mixed $target, bool $result) => PureEnum::doesntHave($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => PureEnum::doesntHave($target) === $result)
     ->toBeTrue()
     ->with([
         [PureEnum::one, false],
@@ -144,7 +144,7 @@ it('determines whether an enum does not have a target')
     ]);
 
 it('determines whether an enum case matches a target')
-    ->expect(fn (mixed $target, bool $result) => PureEnum::one->is($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => PureEnum::one->is($target) === $result)
     ->toBeTrue()
     ->with([
         [PureEnum::one, true],
@@ -158,7 +158,7 @@ it('determines whether an enum case matches a target')
     ]);
 
 it('determines whether an enum case does not match a target')
-    ->expect(fn (mixed $target, bool $result) => PureEnum::one->isNot($target) === $result)
+    ->expect(fn(mixed $target, bool $result) => PureEnum::one->isNot($target) === $result)
     ->toBeTrue()
     ->with([
         [PureEnum::one, false],
@@ -172,7 +172,7 @@ it('determines whether an enum case does not match a target')
     ]);
 
 it('determines whether an enum case matches some targets')
-    ->expect(fn (mixed $targets, bool $result) => PureEnum::one->in($targets) === $result)
+    ->expect(fn(mixed $targets, bool $result) => PureEnum::one->in($targets) === $result)
     ->toBeTrue()
     ->with([
         [[PureEnum::one, PureEnum::two], true],
@@ -186,7 +186,7 @@ it('determines whether an enum case matches some targets')
     ]);
 
 it('determines whether an enum case does not match any target')
-    ->expect(fn (mixed $targets, bool $result) => PureEnum::one->notIn($targets) === $result)
+    ->expect(fn(mixed $targets, bool $result) => PureEnum::one->notIn($targets) === $result)
     ->toBeTrue()
     ->with([
         [[PureEnum::one, PureEnum::two], false],
@@ -221,7 +221,7 @@ it('retrieves a collection of cases sorted by value ascending', function () {
 });
 
 it('retrieves a collection of cases sorted by value descending', function () {
-    expect(PureEnum::sortDescByValue())
+    expect(PureEnum::sortByDescValue())
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBeEmpty();
@@ -235,21 +235,21 @@ it('retrieves a collection of cases sorted by a custom value ascending', functio
 });
 
 it('retrieves a collection of cases sorted by a custom value descending', function () {
-    expect(PureEnum::sortDescBy('color'))
+    expect(PureEnum::sortByDesc('color'))
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([PureEnum::one, PureEnum::two, PureEnum::three]);
 });
 
 it('retrieves a collection of cases sorted by the result of a closure ascending', function () {
-    expect(PureEnum::sortBy(fn (PureEnum $case) => $case->shape()))
+    expect(PureEnum::sortBy(fn(PureEnum $case) => $case->shape()))
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([PureEnum::three, PureEnum::two, PureEnum::one]);
 });
 
 it('retrieves a collection of cases sorted by the result of a closure descending', function () {
-    expect(PureEnum::sortDescBy(fn (PureEnum $case) => $case->shape()))
+    expect(PureEnum::sortByDesc(fn(PureEnum $case) => $case->shape()))
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([PureEnum::one, PureEnum::two, PureEnum::three]);
@@ -260,7 +260,7 @@ it('retrieves the count of cases', function () {
 });
 
 it('retrieves the case hydrated from a value')
-    ->expect(fn (string $value, PureEnum $case) => PureEnum::from($value) === $case)
+    ->expect(fn(string $value, PureEnum $case) => PureEnum::from($value) === $case)
     ->toBeTrue()
     ->with([
         ['one', PureEnum::one],
@@ -268,11 +268,11 @@ it('retrieves the case hydrated from a value')
         ['three', PureEnum::three],
     ]);
 
-it('throws a value error when hydrating cases with an invalid value', fn () => PureEnum::from('1'))
+it('throws a value error when hydrating cases with an invalid value', fn() => PureEnum::from('1'))
     ->throws(ValueError::class, '"1" is not a valid name for enum "Cerbero\Enum\PureEnum"');
 
 it('retrieves the case hydrated from a value or returns null')
-    ->expect(fn (string $value, ?PureEnum $case) => PureEnum::tryFrom($value) === $case)
+    ->expect(fn(string $value, ?PureEnum $case) => PureEnum::tryFrom($value) === $case)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
@@ -283,7 +283,7 @@ it('retrieves the case hydrated from a value or returns null')
     ]);
 
 it('retrieves the case hydrated from a name')
-    ->expect(fn (string $name, PureEnum $case) => PureEnum::fromName($name) === $case)
+    ->expect(fn(string $name, PureEnum $case) => PureEnum::fromName($name) === $case)
     ->toBeTrue()
     ->with([
         ['one', PureEnum::one],
@@ -291,11 +291,11 @@ it('retrieves the case hydrated from a name')
         ['three', PureEnum::three],
     ]);
 
-it('throws a value error when hydrating cases with an invalid name', fn () => PureEnum::fromName('1'))
+it('throws a value error when hydrating cases with an invalid name', fn() => PureEnum::fromName('1'))
     ->throws(ValueError::class, '"1" is not a valid name for enum "Cerbero\Enum\PureEnum"');
 
 it('retrieves the case hydrated from a name or returns null')
-    ->expect(fn (string $name, ?PureEnum $case) => PureEnum::tryFromName($name) === $case)
+    ->expect(fn(string $name, ?PureEnum $case) => PureEnum::tryFromName($name) === $case)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
@@ -306,7 +306,7 @@ it('retrieves the case hydrated from a name or returns null')
     ]);
 
 it('retrieves the cases hydrated from a key')
-    ->expect(fn (string $key, mixed $value, array $cases) => PureEnum::fromKey($key, $value)->cases() === $cases)
+    ->expect(fn(string $key, mixed $value, array $cases) => PureEnum::fromKey($key, $value)->cases() === $cases)
     ->toBeTrue()
     ->with([
         ['color', 'red', [PureEnum::one]],
@@ -315,16 +315,16 @@ it('retrieves the cases hydrated from a key')
     ]);
 
 it('retrieves the cases hydrated from a key using a closure')
-    ->expect(PureEnum::fromKey(fn (PureEnum $case) => $case->shape(), 'square'))
+    ->expect(PureEnum::fromKey(fn(PureEnum $case) => $case->shape(), 'square'))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([PureEnum::two]);
 
-it('throws a value error when hydrating cases with an invalid key', fn () => PureEnum::fromKey('color', 'orange'))
+it('throws a value error when hydrating cases with an invalid key', fn() => PureEnum::fromKey('color', 'orange'))
     ->throws(ValueError::class, 'Invalid value for the key "color" for enum "Cerbero\Enum\PureEnum"');
 
 it('retrieves the case hydrated from a key or returns null')
-    ->expect(fn (string $key, mixed $value, ?array $cases) => PureEnum::tryFromKey($key, $value)?->cases() === $cases)
+    ->expect(fn(string $key, mixed $value, ?array $cases) => PureEnum::tryFromKey($key, $value)?->cases() === $cases)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
@@ -335,13 +335,13 @@ it('retrieves the case hydrated from a key or returns null')
     ]);
 
 it('attempts to retrieve the case hydrated from a key using a closure')
-    ->expect(PureEnum::tryFromKey(fn (PureEnum $case) => $case->shape(), 'square'))
+    ->expect(PureEnum::tryFromKey(fn(PureEnum $case) => $case->shape(), 'square'))
     ->toBeInstanceOf(CasesCollection::class)
     ->cases()
     ->toBe([PureEnum::two]);
 
 it('retrieves the key of a case')
-    ->expect(fn (string $key, mixed $value) => PureEnum::one->get($key) === $value)
+    ->expect(fn(string $key, mixed $value) => PureEnum::one->get($key) === $value)
     ->toBeTrue()
     ->with([
         ['name', 'one'],
@@ -350,8 +350,8 @@ it('retrieves the key of a case')
     ]);
 
 it('retrieves the key of a case using a closure')
-    ->expect(PureEnum::one->get(fn (PureEnum $case) => $case->color()))
+    ->expect(PureEnum::one->get(fn(PureEnum $case) => $case->color()))
     ->toBe('red');
 
-it('throws a value error when attempting to retrieve an invalid key', fn () => PureEnum::one->get('invalid'))
+it('throws a value error when attempting to retrieve an invalid key', fn() => PureEnum::one->get('invalid'))
     ->throws(ValueError::class, '"invalid" is not a valid key for enum "Cerbero\Enum\PureEnum"');

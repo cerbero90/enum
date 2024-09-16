@@ -21,7 +21,7 @@ it('retrieves the first case')
 
 it('retrieves the first case with a closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->first(fn (PureEnum $case) => !$case->isOdd())
+    ->first(fn(PureEnum $case) => !$case->isOdd())
     ->toBe(PureEnum::two);
 
 it('returns null if no case is present')
@@ -46,7 +46,7 @@ it('retrieves the cases keyed by a custom key')
 
 it('retrieves the cases keyed by a custom closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->keyBy(fn (PureEnum $case) => $case->shape())
+    ->keyBy(fn(PureEnum $case) => $case->shape())
     ->toBe(['triangle' => PureEnum::one, 'square' => PureEnum::two, 'circle' => PureEnum::three]);
 
 it('retrieves the cases keyed by value')
@@ -66,7 +66,7 @@ it('retrieves the cases grouped by a custom key')
 
 it('retrieves the cases grouped by a custom closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->groupBy(fn (PureEnum $case) => $case->isOdd())
+    ->groupBy(fn(PureEnum $case) => $case->isOdd())
     ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
 
 it('retrieves all the names of the cases')
@@ -101,7 +101,7 @@ it('retrieves a list of custom values when plucking with an argument')
 
 it('retrieves a list of custom values when plucking with a closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->pluck(fn (PureEnum $case) => $case->shape())
+    ->pluck(fn(PureEnum $case) => $case->shape())
     ->toBe(['triangle', 'square', 'circle']);
 
 it('retrieves an associative array with custom values and keys when plucking with arguments')
@@ -111,11 +111,11 @@ it('retrieves an associative array with custom values and keys when plucking wit
 
 it('retrieves an associative array with custom values and keys when plucking with closures')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->pluck(fn (PureEnum $case) => $case->shape(), fn (PureEnum $case) => $case->color())
+    ->pluck(fn(PureEnum $case) => $case->shape(), fn(PureEnum $case) => $case->color())
     ->toBe(['red' => 'triangle', 'green' => 'square', 'blue' => 'circle']);
 
 it('retrieves a collection with filtered cases', function () {
-    expect((new CasesCollection(PureEnum::cases()))->filter(fn (PureEnum $case) => $case->isOdd()))
+    expect((new CasesCollection(PureEnum::cases()))->filter(fn(PureEnum $case) => $case->isOdd()))
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([PureEnum::one, PureEnum::three]);
@@ -192,7 +192,7 @@ it('retrieves a collection of cases sorted by a key ascending', function () {
 });
 
 it('retrieves a collection of cases sorted by a key decending', function () {
-    expect((new CasesCollection(PureEnum::cases()))->sortDescBy('color'))
+    expect((new CasesCollection(PureEnum::cases()))->sortByDesc('color'))
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([PureEnum::one, PureEnum::two, PureEnum::three]);
@@ -206,7 +206,7 @@ it('retrieves a collection of cases sorted by value ascending', function () {
 });
 
 it('retrieves a collection of cases sorted by value decending', function () {
-    expect((new CasesCollection(BackedEnum::cases()))->sortDescByValue())
+    expect((new CasesCollection(BackedEnum::cases()))->sortByDescValue())
         ->toBeInstanceOf(CasesCollection::class)
         ->cases()
         ->toBe([BackedEnum::three, BackedEnum::two, BackedEnum::one]);
