@@ -34,16 +34,6 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the iterable cases.
-     *
-     * @return Traversable<TKey, TValue>
-     */
-    public function getIterator(): Traversable
-    {
-        yield from $this->cases;
-    }
-
-    /**
      * Retrieve the cases.
      *
      * @return array<TKey, TValue>
@@ -51,6 +41,16 @@ class CasesCollection implements Countable, IteratorAggregate
     public function cases(): array
     {
         return $this->cases;
+    }
+
+    /**
+     * Retrieve the iterable cases.
+     *
+     * @return Traversable<TKey, TValue>
+     */
+    public function getIterator(): Traversable
+    {
+        yield from $this->cases;
     }
 
     /**
