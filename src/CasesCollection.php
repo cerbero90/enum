@@ -34,11 +34,11 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the cases.
+     * Retrieve all the cases.
      *
      * @return array<TKey, TValue>
      */
-    public function cases(): array
+    public function all(): array
     {
         return $this->cases;
     }
