@@ -106,16 +106,19 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Retrieve the mapped cases.
+     * Retrieve the result of mapping over the cases.
      *
-     * @param callable(TValue): mixed $callback
+     * @template TMapValue
+     *
+     * @param callable(TValue, TKey): TMapValue $callback
+     * @return array<TKey, TMapValue>
      */
-    public function map(callable $callback): static
+    public function map(callable $callback): array
     {
         $keys = array_keys($this->cases);
         $values = array_map($callback, $this->cases, $keys);
 
-        return new static(array_combine($keys, $values));
+        return array_combine($keys, $values);
     }
 
     /**
