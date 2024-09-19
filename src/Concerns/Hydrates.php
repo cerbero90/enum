@@ -7,15 +7,13 @@ use ValueError;
 
 /**
  * The trait to hydrate an enum.
- *
  */
 trait Hydrates
 {
     /**
-     * Retrieve the case hydrated from the given name (called by pure enums only)
+     * Retrieve the case hydrated from the given name or fail.
+     * This method can be called by pure enums only.
      *
-     * @param string $name
-     * @return static
      * @throws ValueError
      */
     public static function from(string $name): static
@@ -24,21 +22,8 @@ trait Hydrates
     }
 
     /**
-     * Retrieve the case hydrated from the given name or NULL (called by pure enums only)
+     * Retrieve the case hydrated from the given name or fail.
      *
-     * @param string $name
-     * @return static|null
-     */
-    public static function tryFrom(string $name): ?static
-    {
-        return static::tryFromName($name);
-    }
-
-    /**
-     * Retrieve the case hydrated from the given name
-     *
-     * @param string $name
-     * @return static
      * @throws ValueError
      */
     public static function fromName(string $name): static
@@ -51,10 +36,7 @@ trait Hydrates
     }
 
     /**
-     * Retrieve the case hydrated from the given name or NULL
-     *
-     * @param string $name
-     * @return static|null
+     * Retrieve the case hydrated from the given name or NULL.
      */
     public static function tryFromName(string $name): ?static
     {
@@ -68,17 +50,25 @@ trait Hydrates
     }
 
     /**
-     * Retrieve cases hydrated from the given key
+     * Retrieve the case hydrated from the given name or NULL.
+     * This method can be called by pure enums only.
+     */
+    public static function tryFrom(string $name): ?static
+    {
+        return static::tryFromName($name);
+    }
+
+    /**
+     * Retrieve all the cases hydrated from the given key or fail.
      *
-     * @param callable|string $key
-     * @param mixed $value
-     * @return CasesCollection
+     * @param (callable(self): mixed)|string $key
+     * @return CasesCollection<array-key, self>
      * @throws ValueError
      */
     public static function fromKey(callable|string $key, mixed $value): CasesCollection
     {
-        if ($result = static::tryFromKey($key, $value)) {
-            return $result;
+        if ($cases = static::tryFromKey($key, $value)) {
+            return $cases;
         }
 
         $target = is_callable($key) ? 'given callable key' : "key \"{$key}\"";
@@ -87,13 +77,12 @@ trait Hydrates
     }
 
     /**
-     * Retrieve cases hydrated from the given key or NULL
+     * Retrieve all the cases hydrated from the given key or NULL.
      *
-     * @param callable|string $key
-     * @param mixed $value
-     * @return CasesCollection|null
+     * @param (callable(self): mixed)|string $key
+     * @return ?CasesCollection<array-key, self>
      */
-    public static function tryFromKey(callable|string $key, mixed $value): CasesCollection|null
+    public static function tryFromKey(callable|string $key, mixed $value): ?CasesCollection
     {
         $cases = [];
 
