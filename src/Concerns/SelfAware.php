@@ -43,7 +43,7 @@ trait SelfAware
         } catch (Throwable) {
             $target = is_callable($key) ? 'The given callable' : "\"{$key}\"";
 
-            throw new ValueError(sprintf('%s is not a valid key for the enum "%s"', $target, static::class));
+            throw new ValueError(sprintf('%s is not a valid key for enum "%s"', $target, static::class));
         }
     }
 }
