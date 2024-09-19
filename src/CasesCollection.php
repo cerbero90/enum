@@ -89,13 +89,10 @@ class CasesCollection implements Countable, IteratorAggregate
     /**
      * Retrieve the first case.
      *
-     * @template TFirstDefault
-     *
      * @param (callable(TValue, TKey): bool)|null $callback
-     * @param TFirstDefault $default
-     * @return TValue|TFirstDefault
+     * @return ?TValue
      */
-    public function first(callable $callback = null, mixed $default = null): mixed
+    public function first(callable $callback = null): mixed
     {
         $callback ??= fn() => true;
 
@@ -105,7 +102,7 @@ class CasesCollection implements Countable, IteratorAggregate
             }
         }
 
-        return $default;
+        return null;
     }
 
     /**
