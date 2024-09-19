@@ -196,8 +196,8 @@ class CasesCollection implements Countable, IteratorAggregate
      *
      * @template TPluckValue
      *
-     * @param (callable(TValue): array-key)|string $value
-     * @param (callable(TValue): TPluckValue)|string|null $key
+     * @param (callable(TValue): TPluckValue)|string $value
+     * @param (callable(TValue): array-key)|string|null $key
      * @return array<array-key, TPluckValue>
      */
     public function pluck(callable|string $value, callable|string $key = null): array
