@@ -57,7 +57,7 @@ trait SelfAware
      * @return TGetValue
      * @throws ValueError
      */
-    public function get(callable|string $key): mixed
+    public function resolveKey(callable|string $key): mixed
     {
         try {
             return is_callable($key) ? $key($this) : ($this->$key ?? $this->$key());

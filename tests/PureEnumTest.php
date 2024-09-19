@@ -341,7 +341,7 @@ it('attempts to retrieve the case hydrated from a key using a closure')
     ->toBe([PureEnum::two]);
 
 it('retrieves the key of a case')
-    ->expect(fn(string $key, mixed $value) => PureEnum::one->get($key) === $value)
+    ->expect(fn(string $key, mixed $value) => PureEnum::one->resolveKey($key) === $value)
     ->toBeTrue()
     ->with([
         ['name', 'one'],
@@ -350,8 +350,8 @@ it('retrieves the key of a case')
     ]);
 
 it('retrieves the key of a case using a closure')
-    ->expect(PureEnum::one->get(fn(PureEnum $case) => $case->color()))
+    ->expect(PureEnum::one->resolveKey(fn(PureEnum $case) => $case->color()))
     ->toBe('red');
 
-it('throws a value error when attempting to retrieve an invalid key', fn() => PureEnum::one->get('invalid'))
+it('throws a value error when attempting to retrieve an invalid key', fn() => PureEnum::one->resolveKey('invalid'))
     ->throws(ValueError::class, '"invalid" is not a valid key for enum "Cerbero\Enum\PureEnum"');

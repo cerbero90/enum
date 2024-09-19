@@ -87,7 +87,7 @@ trait Hydrates
         $cases = [];
 
         foreach (self::cases() as $case) {
-            if ($case->get($key) === $value) {
+            if ($case->resolveKey($key) === $value) {
                 $cases[] = $case;
             }
         }
