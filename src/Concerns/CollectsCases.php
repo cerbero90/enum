@@ -32,7 +32,7 @@ trait CollectsCases
      *
      * @param (callable(self, array-key): bool)|null $callback
      */
-    public function first(callable $callback = null): ?self
+    public static function first(callable $callback = null): ?self
     {
         return self::collect()->first($callback);
     }
@@ -79,7 +79,7 @@ trait CollectsCases
      * @param callable(self, array-key): TMapValue $callback
      * @return array<array-key, TMapValue>
      */
-    public function map(callable $callback): array
+    public static function map(callable $callback): array
     {
         return self::collect()->map($callback);
     }
