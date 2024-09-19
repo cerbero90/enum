@@ -106,6 +106,50 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Retrieve all the names of the cases.
+     *
+     * @return string[]
+     */
+    public function names(): array
+    {
+        return array_column($this->cases, 'name');
+    }
+
+    /**
+     * Retrieve all the values of the backed cases.
+     *
+     * @return list<string|int>
+     */
+    public function values(): array
+    {
+        return array_column($this->cases, 'value');
+    }
+
+    /**
+     * Retrieve an array of values optionally keyed by the given key.
+     *
+     * @template TPluckValue
+     *
+     * @param (callable(TValue): TPluckValue)|string $value
+     * @param (callable(TValue): array-key)|string|null $key
+     * @return array<array-key, TPluckValue>
+     */
+    public function pluck(callable|string $value, callable|string $key = null): array
+    {
+        $result = [];
+
+        foreach ($this->cases as $case) {
+            if ($key === null) {
+                $result[] = $case->get($value);
+            } else {
+                $result[$case->get($key)] = $case->get($value);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Retrieve the result of mapping over the cases.
      *
      * @template TMapValue
@@ -169,50 +213,6 @@ class CasesCollection implements Countable, IteratorAggregate
         }
 
         return new static($grouped);
-    }
-
-    /**
-     * Retrieve all the names of the cases.
-     *
-     * @return string[]
-     */
-    public function names(): array
-    {
-        return array_column($this->cases, 'name');
-    }
-
-    /**
-     * Retrieve all the values of the backed cases.
-     *
-     * @return list<string|int>
-     */
-    public function values(): array
-    {
-        return array_column($this->cases, 'value');
-    }
-
-    /**
-     * Retrieve an array of values optionally keyed by the given key.
-     *
-     * @template TPluckValue
-     *
-     * @param (callable(TValue): TPluckValue)|string $value
-     * @param (callable(TValue): array-key)|string|null $key
-     * @return array<array-key, TPluckValue>
-     */
-    public function pluck(callable|string $value, callable|string $key = null): array
-    {
-        $result = [];
-
-        foreach ($this->cases as $case) {
-            if ($key === null) {
-                $result[] = $case->get($value);
-            } else {
-                $result[$case->get($key)] = $case->get($value);
-            }
-        }
-
-        return $result;
     }
 
     /**

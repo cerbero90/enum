@@ -38,6 +38,40 @@ trait CollectsCases
     }
 
     /**
+     * Retrieve the name of all the cases.
+     *
+     * @return string[]
+     */
+    public static function names(): array
+    {
+        return self::collect()->names();
+    }
+
+    /**
+     * Retrieve the value of all the backed cases.
+     *
+     * @return list<string|int>
+     */
+    public static function values(): array
+    {
+        return self::collect()->values();
+    }
+
+    /**
+     * Retrieve an array of values optionally keyed by the given key.
+     *
+     * @template TPluckValue
+     *
+     * @param (callable(self): TPluckValue)|string $value
+     * @param (callable(self): array-key)|string|null $key
+     * @return array<array-key, TPluckValue>
+     */
+    public static function pluck(callable|string $value, callable|string $key = null): array
+    {
+        return self::collect()->pluck($value, $key);
+    }
+
+    /**
      * Retrieve the result of mapping over all the cases.
      *
      * @template TMapValue
@@ -90,40 +124,6 @@ trait CollectsCases
     public static function groupBy(callable|string $key): CasesCollection
     {
         return self::collect()->groupBy($key);
-    }
-
-    /**
-     * Retrieve the name of all the cases.
-     *
-     * @return string[]
-     */
-    public static function names(): array
-    {
-        return self::collect()->names();
-    }
-
-    /**
-     * Retrieve the value of all the backed cases.
-     *
-     * @return list<string|int>
-     */
-    public static function values(): array
-    {
-        return self::collect()->values();
-    }
-
-    /**
-     * Retrieve an array of values optionally keyed by the given key.
-     *
-     * @template TPluckValue
-     *
-     * @param (callable(self): TPluckValue)|string $value
-     * @param (callable(self): array-key)|string|null $key
-     * @return array<array-key, TPluckValue>
-     */
-    public static function pluck(callable|string $value, callable|string $key = null): array
-    {
-        return self::collect()->pluck($value, $key);
     }
 
     /**
