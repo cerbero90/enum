@@ -3,14 +3,12 @@
 namespace Cerbero\Enum\Concerns;
 
 /**
- * The trait to extend enum functionalities.
- *
+ * The trait to supercharge the functionalities of an enum.
  */
 trait Enumerates
 {
     use CollectsCases;
     use Compares;
     use Hydrates;
-    use KeysAware;
     use SelfAware;
 }
