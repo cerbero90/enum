@@ -3,6 +3,8 @@
 namespace Cerbero\Enum\Concerns;
 
 use BackedEnum;
+use ReflectionClass;
+use ReflectionMethod;
 use Throwable;
 use ValueError;
 
@@ -16,7 +18,7 @@ trait SelfAware
      */
     public static function isPure(): bool
     {
-        return !static::isBacked();
+        return !self::isBacked();
     }
 
     /**
@@ -24,7 +26,26 @@ trait SelfAware
      */
     public static function isBacked(): bool
     {
-        return is_subclass_of(static::class, BackedEnum::class);
+        return is_subclass_of(self::class, BackedEnum::class);
+    }
+
+    /**
+     * Retrieve all the keys of the enum.
+     *
+     * @return string[]
+     */
+    public static function keys(): array
+    {
+        $enum = new ReflectionClass(self::class);
+        $keys = self::isPure() ? ['name'] : ['name', 'value'];
+
+        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (! $method->isStatic() && $method->getFileName() == $enum->getFileName()) {
+                $keys[] = $method->getShortName();
+            }
+        }
+
+        return $keys;
     }
 
     /**
@@ -43,7 +64,7 @@ trait SelfAware
         } catch (Throwable) {
             $target = is_callable($key) ? 'The given callable' : "\"{$key}\"";
 
-            throw new ValueError(sprintf('%s is not a valid key for enum "%s"', $target, static::class));
+            throw new ValueError(sprintf('%s is not a valid key for enum "%s"', $target, self::class));
         }
     }
 }
