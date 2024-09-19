@@ -12,7 +12,7 @@ trait Compares
      */
     public static function has(mixed $target): bool
     {
-        foreach (static::cases() as $case) {
+        foreach (self::cases() as $case) {
             if ($case->is($target)) {
                 return true;
             }
@@ -26,7 +26,7 @@ trait Compares
      */
     public static function doesntHave(mixed $target): bool
     {
-        foreach (static::cases() as $case) {
+        foreach (self::cases() as $case) {
             if ($case->is($target)) {
                 return false;
             }
@@ -40,7 +40,7 @@ trait Compares
      */
     public function is(mixed $target): bool
     {
-        return in_array($target, [$this, static::isPure() ? $this->name : $this->value], true);
+        return in_array($target, [$this, self::isPure() ? $this->name : $this->value], true);
     }
 
     /**

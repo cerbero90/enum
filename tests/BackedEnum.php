@@ -24,9 +24,9 @@ enum BackedEnum: int
     public function color(): string
     {
         return match ($this) {
-            static::one => 'red',
-            static::two => 'green',
-            static::three => 'blue',
+            self::one => 'red',
+            self::two => 'green',
+            self::three => 'blue',
         };
     }
 
@@ -38,9 +38,9 @@ enum BackedEnum: int
     public function shape(): string
     {
         return match ($this) {
-            static::one => 'triangle',
-            static::two => 'square',
-            static::three => 'circle',
+            self::one => 'triangle',
+            self::two => 'square',
+            self::three => 'circle',
         };
     }
 
@@ -52,9 +52,9 @@ enum BackedEnum: int
     public function isOdd(): bool
     {
         return match ($this) {
-            static::one => true,
-            static::two => false,
-            static::three => true,
+            self::one => true,
+            self::two => false,
+            self::three => true,
         };
     }
 }

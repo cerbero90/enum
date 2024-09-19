@@ -18,7 +18,7 @@ trait Hydrates
      */
     public static function from(string $name): static
     {
-        return static::fromName($name);
+        return self::fromName($name);
     }
 
     /**
@@ -28,11 +28,11 @@ trait Hydrates
      */
     public static function fromName(string $name): static
     {
-        if ($case = static::tryFromName($name)) {
+        if ($case = self::tryFromName($name)) {
             return $case;
         }
 
-        throw new ValueError(sprintf('"%s" is not a valid name for enum "%s"', $name, static::class));
+        throw new ValueError(sprintf('"%s" is not a valid name for enum "%s"', $name, self::class));
     }
 
     /**
@@ -40,7 +40,7 @@ trait Hydrates
      */
     public static function tryFromName(string $name): ?static
     {
-        foreach (static::cases() as $case) {
+        foreach (self::cases() as $case) {
             if ($case->name === $name) {
                 return $case;
             }
@@ -55,7 +55,7 @@ trait Hydrates
      */
     public static function tryFrom(string $name): ?static
     {
-        return static::tryFromName($name);
+        return self::tryFromName($name);
     }
 
     /**
@@ -67,13 +67,13 @@ trait Hydrates
      */
     public static function fromKey(callable|string $key, mixed $value): CasesCollection
     {
-        if ($cases = static::tryFromKey($key, $value)) {
+        if ($cases = self::tryFromKey($key, $value)) {
             return $cases;
         }
 
         $target = is_callable($key) ? 'given callable key' : "key \"{$key}\"";
 
-        throw new ValueError(sprintf('Invalid value for the %s for enum "%s"', $target, static::class));
+        throw new ValueError(sprintf('Invalid value for the %s for enum "%s"', $target, self::class));
     }
 
     /**
@@ -86,7 +86,7 @@ trait Hydrates
     {
         $cases = [];
 
-        foreach (static::cases() as $case) {
+        foreach (self::cases() as $case) {
             if ($case->get($key) === $value) {
                 $cases[] = $case;
             }
