@@ -67,4 +67,12 @@ trait SelfAware
             throw new ValueError(sprintf('%s is not a valid key for enum "%s"', $target, self::class));
         }
     }
+
+    /**
+     * Retrieve the value of a backed case or the name of a pure case.
+     */
+    public function value(): string|int
+    {
+        return $this->value ?? $this->name;
+    }
 }
