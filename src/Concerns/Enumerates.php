@@ -10,5 +10,6 @@ trait Enumerates
     use CollectsCases;
     use Compares;
     use Hydrates;
+    use IsMagic;
     use SelfAware;
 }
