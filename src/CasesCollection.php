@@ -77,16 +77,6 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Add cases to the collection.
-     *
-     * @param TValue ...$cases
-     */
-    public function add(mixed ...$cases): static
-    {
-        return new static([...$this->cases, ...$cases]);
-    }
-
-    /**
      * Retrieve the first case.
      *
      * @param (callable(TValue, TKey): bool)|null $callback
@@ -207,9 +197,11 @@ class CasesCollection implements Countable, IteratorAggregate
         $grouped = [];
 
         foreach ($this->cases as $case) {
-            $grouped[$case->resolveKey($key)] ??= new static([]);
+            $grouped[$case->resolveKey($key)][] = $case;
+        }
 
-            $grouped[$case->resolveKey($key)]->add($case);
+        foreach ($grouped as $key => $cases) {
+            $grouped[$key] = new static($cases);
         }
 
         return new static($grouped);
