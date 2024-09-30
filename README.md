@@ -31,7 +31,7 @@ composer require cerbero/enum
 * [Elaborating cases](#elaborating-cases)
 * [Cases collection](#cases-collection)
 
-To supercharge our enums with all functionalities provided by this package, we can simply use the `Enumerates` trait in both pure enums and backed enums:
+To supercharge our enums with the features provided by this package, we can let our enums use the `Enumerates` trait:
 
 ```php
 use Cerbero\Enum\Concerns\Enumerates;
@@ -108,7 +108,7 @@ Comparisons can also be performed within arrays:
 ```php
 PureEnum::one->in(['one', 'four']); // true
 PureEnum::one->in([1, 4]); // false
-PureEnum::one->notIn('one', 'four'); // false
+PureEnum::one->notIn(['one', 'four']); // false
 PureEnum::one->notIn([1, 4]); // true
 
 BackedEnum::one->in([1, 4]); // true
@@ -120,7 +120,7 @@ BackedEnum::one->notIn(['one', 'four']); // true
 
 ### Keys resolution
 
-With the term "key" we refer to any element defined in an enum, such as names, values or methods implemented by cases. Take the following enum for example:
+With the term "key" we refer to any element defined for an enum case, such as its name, value or public methods. Take the following enum for example:
 
 ```php
 enum BackedEnum: int
@@ -134,35 +134,35 @@ enum BackedEnum: int
     public function color(): string
     {
         return match ($this) {
-            static::one => 'red',
-            static::two => 'green',
-            static::three => 'blue',
+            self::one => 'red',
+            self::two => 'green',
+            self::three => 'blue',
         };
     }
 
     public function isOdd(): bool
     {
         return match ($this) {
-            static::one => true,
-            static::two => false,
-            static::three => true,
+            self::one => true,
+            self::two => false,
+            self::three => true,
         };
     }
 }
 ```
 
-The keys defined in this enum are `name`, `value` (as it is a backed enum), `color` and `isOdd`. We can retrieve any key assigned to a case by calling `get()`:
+The keys defined in this enum are `name`, `value` (as it is a backed enum), `color` and `isOdd`. We can retrieve any key assigned to a case by calling `resolveKey()`:
 
 ```php
-PureEnum::one->get('name'); // 'one'
-PureEnum::one->get('value'); // throws ValueError as it is a pure enum
-PureEnum::one->get('color'); // 'red'
-PureEnum::one->get(fn(PureEnum $caseOne) => $caseOne->isOdd()); // true
+PureEnum::one->resolveKey('name'); // 'one'
+PureEnum::one->resolveKey('value'); // throws ValueError as it is a pure enum
+PureEnum::one->resolveKey('color'); // 'red'
+PureEnum::one->resolveKey(fn(PureEnum $caseOne) => $caseOne->isOdd()); // true
 
-BackedEnum::one->get('name'); // 'one'
-BackedEnum::one->get('value'); // 1
-BackedEnum::one->get('color'); // 'red'
-BackedEnum::one->get(fn(BackedEnum $caseOne) => $caseOne->isOdd()); // true
+BackedEnum::one->resolveKey('name'); // 'one'
+BackedEnum::one->resolveKey('value'); // 1
+BackedEnum::one->resolveKey('color'); // 'red'
+BackedEnum::one->resolveKey(fn(BackedEnum $caseOne) => $caseOne->isOdd()); // true
 ```
 
 At first glance this method may seem an overkill as "keys" can be accessed directly by cases like this:
@@ -233,7 +233,7 @@ PureEnum::casesBy('color'); // ['red' => PureEnum::one, 'green' => PureEnum::two
 PureEnum::groupBy('color'); // ['red' => [PureEnum::one], 'green' => [PureEnum::two], 'blue' => [PureEnum::three]]
 PureEnum::names(); // ['one', 'two', 'three']
 PureEnum::values(); // []
-PureEnum::pluck(); // ['one', 'two', 'three']
+PureEnum::pluck('name'); // ['one', 'two', 'three']
 PureEnum::pluck('color'); // ['red', 'green', 'blue']
 PureEnum::pluck(fn(PureEnum $case) => $case->isOdd()); // [true, false, true]
 PureEnum::pluck('color', 'shape'); // ['triangle' => 'red', 'square' => 'green', 'circle' => 'blue']
@@ -259,7 +259,7 @@ BackedEnum::casesBy('color'); // ['red' => BackedEnum::one, 'green' => BackedEnu
 BackedEnum::groupBy('color'); // ['red' => [BackedEnum::one], 'green' => [BackedEnum::two], 'blue' => [BackedEnum::three]]
 BackedEnum::names(); // ['one', 'two', 'three']
 BackedEnum::values(); // [1, 2, 3]
-BackedEnum::pluck(); // [1, 2, 3]
+BackedEnum::pluck('value'); // [1, 2, 3]
 BackedEnum::pluck('color'); // ['red', 'green', 'blue']
 BackedEnum::pluck(fn(BackedEnum $case) => $case->isOdd()); // [true, false, true]
 BackedEnum::pluck('color', 'shape'); // ['triangle' => 'red', 'square' => 'green', 'circle' => 'blue']
@@ -306,7 +306,7 @@ foreach (PureEnum::collect() as $case) {
 Obtaining the underlying plain list of cases is easy:
 
 ```php
-PureEnum::collect()->cases(); // [PureEnum::one, PureEnum::two, PureEnum::three]
+PureEnum::collect()->all(); // [PureEnum::one, PureEnum::two, PureEnum::three]
 ```
 
 Sometimes we may need to extract only the first case of the collection:
@@ -318,13 +318,13 @@ PureEnum::filter(fn(PureEnum $case) => !$case->isOdd())->first(); // PureEnum::t
 For reference, here are all the operations available in `CasesCollection`:
 
 ```php
-PureEnum::collect()->cases(); // [PureEnum::one, PureEnum::two, PureEnum::three]
+PureEnum::collect()->all(); // [PureEnum::one, PureEnum::two, PureEnum::three]
 PureEnum::collect()->count(); // 3
 PureEnum::collect()->first(); // PureEnum::one
-PureEnum::collect()->keyByName(); // ['one' => PureEnum::one, 'two' => PureEnum::two, 'three' => PureEnum::three]
-PureEnum::collect()->keyByValue(); // []
-PureEnum::collect()->keyBy('color'); // ['red' => PureEnum::one, 'green' => PureEnum::two, 'blue' => PureEnum::three]
-PureEnum::collect()->groupBy('color'); // ['red' => [PureEnum::one], 'green' => [PureEnum::two], 'blue' => [PureEnum::three]]
+PureEnum::collect()->keyByName(); // CasesCollection<'one' => PureEnum::one, 'two' => PureEnum::two, 'three' => PureEnum::three>
+PureEnum::collect()->keyByValue(); // CasesCollection<>
+PureEnum::collect()->keyBy('color'); // CasesCollection<'red' => PureEnum::one, 'green' => PureEnum::two, 'blue' => PureEnum::three>
+PureEnum::collect()->groupBy('color'); // CasesCollection<'red' => CasesCollection<PureEnum::one>, 'green' => CasesCollection<PureEnum::two>, 'blue' => CasesCollection<PureEnum::three>>
 PureEnum::collect()->names(); // ['one', 'two', 'three']
 PureEnum::collect()->values(); // []
 PureEnum::collect()->pluck(); // ['one', 'two', 'three']
@@ -345,13 +345,13 @@ PureEnum::collect()->sortByDescValue(); // CasesCollection<>
 PureEnum::collect()->sortBy('color'); // CasesCollection<PureEnum::three, PureEnum::two, PureEnum::one>
 PureEnum::collect()->sortByDesc(fn(PureEnum $case) => $case->color()); // CasesCollection<PureEnum::one, PureEnum::two, PureEnum::three>
 
-BackedEnum::collect()->cases(); // [BackedEnum::one, BackedEnum::two, BackedEnum::three]
+BackedEnum::collect()->all(); // [BackedEnum::one, BackedEnum::two, BackedEnum::three]
 BackedEnum::collect()->count(); // 3
 BackedEnum::collect()->first(); // BackedEnum::one
-BackedEnum::collect()->keyByName(); // ['one' => BackedEnum::one, 'two' => BackedEnum::two, 'three' => BackedEnum::three]
-BackedEnum::collect()->keyByValue(); // [1 => BackedEnum::one, 2 => BackedEnum::two, 3 => BackedEnum::three]
-BackedEnum::collect()->keyBy('color'); // ['red' => BackedEnum::one, 'green' => BackedEnum::two, 'blue' => BackedEnum::three]
-BackedEnum::collect()->groupBy('color'); // ['red' => [BackedEnum::one], 'green' => [BackedEnum::two], 'blue' => [BackedEnum::three]]
+BackedEnum::collect()->keyByName(); // CasesCollection<'one' => BackedEnum::one, 'two' => BackedEnum::two, 'three' => BackedEnum::three>
+BackedEnum::collect()->keyByValue(); // CasesCollection<1 => BackedEnum::one, 2 => BackedEnum::two, 3 => BackedEnum::three>
+BackedEnum::collect()->keyBy('color'); // CasesCollection<'red' => BackedEnum::one, 'green' => BackedEnum::two, 'blue' => BackedEnum::three>
+BackedEnum::collect()->groupBy('color'); // CasesCollection<'red' => CasesCollection<BackedEnum::one>, 'green' => CasesCollection<BackedEnum::two>, 'blue' => CasesCollection<BackedEnum::three>>
 BackedEnum::collect()->names(); // ['one', 'two', 'three']
 BackedEnum::collect()->values(); // [1, 2, 3]
 BackedEnum::collect()->pluck(); // [1, 2, 3]
