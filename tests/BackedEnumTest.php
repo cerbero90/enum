@@ -271,7 +271,8 @@ it('retrieves the case hydrated from a value')
     ]);
 
 it('throws a value error when hydrating backed cases with a missing value', fn() => BackedEnum::from(4))
-    ->throws(ValueError::class, '4 is not a valid backing value for enum "Cerbero\Enum\BackedEnum"');
+    ->throwsIf(version_compare(PHP_VERSION, '8.2') == -1, ValueError::class, '4 is not a valid backing value for enum "Cerbero\Enum\BackedEnum"')
+    ->throwsIf(version_compare(PHP_VERSION, '8.2') >= 0, ValueError::class, '4 is not a valid backing value for enum Cerbero\Enum\BackedEnum');
 
 it('retrieves the case hydrated from a value or returns null')
     ->expect(fn(int $value, ?BackedEnum $case) => BackedEnum::tryFrom($value) === $case)
