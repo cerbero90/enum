@@ -20,6 +20,8 @@ it('retrieves a collection with all the cases')
 
 it('retrieves all cases keyed by name', function () {
     expect(PureEnum::keyByName())
+        ->toBeInstanceOf(CasesCollection::class)
+        ->all()
         ->toBe(['one' => PureEnum::one, 'two' => PureEnum::two, 'three' => PureEnum::three]);
 });
 
@@ -30,12 +32,19 @@ it('retrieves all cases keyed by value', function () {
 
 it('retrieves all cases keyed by a custom key', function () {
     expect(PureEnum::keyBy('color'))
+        ->toBeInstanceOf(CasesCollection::class)
+        ->all()
         ->toBe(['red' => PureEnum::one, 'green' => PureEnum::two, 'blue' => PureEnum::three]);
 });
 
 it('retrieves all cases keyed by the result of a closure', function () {
     expect(PureEnum::keyBy(fn(PureEnum $case) => $case->shape()))
-        ->toBe(['triangle' => PureEnum::one, 'square' => PureEnum::two, 'circle' => PureEnum::three]);
+        ->toBeInstanceOf(CasesCollection::class)
+        ->sequence(
+            fn(Expectation $case, Expectation $key) => $key->toBe('triangle')->and($case)->toBe(PureEnum::one),
+            fn(Expectation $case, Expectation $key) => $key->toBe('square')->and($case)->toBe(PureEnum::two),
+            fn(Expectation $case, Expectation $key) => $key->toBe('circle')->and($case)->toBe(PureEnum::three),
+        );
 });
 
 it('retrieves all cases grouped by a custom key', function () {
