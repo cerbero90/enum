@@ -15,6 +15,11 @@ it('retrieves the count of all the cases')
     ->count()
     ->toBe(3);
 
+it('retrieves all the cases as a plain array recursively')
+    ->expect((new CasesCollection(PureEnum::cases()))->groupBy('isOdd'))
+    ->toArray()
+    ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
+
 it('retrieves the first case')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->first()
@@ -29,6 +34,11 @@ it('returns null if no case is present')
     ->expect(new CasesCollection([]))
     ->first()
     ->toBeNull();
+
+it('retrieves the result of mapping over the cases')
+    ->expect(new CasesCollection(PureEnum::cases()))
+    ->map(fn(PureEnum $case) => $case->color())
+    ->toBe(['red', 'green', 'blue']);
 
 it('retrieves the cases keyed by name')
     ->expect((new CasesCollection(PureEnum::cases()))->keyByName())

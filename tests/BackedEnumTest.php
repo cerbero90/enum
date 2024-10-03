@@ -2,6 +2,7 @@
 
 use Cerbero\Enum\CasesCollection;
 use Cerbero\Enum\BackedEnum;
+use Cerbero\Enum\Enums;
 use Pest\Expectation;
 
 it('determines whether the enum is pure')
@@ -15,6 +16,27 @@ it('determines whether the enum is backed')
 it('retrieves all the names of the cases')
     ->expect(BackedEnum::names())
     ->toBe(['one', 'two', 'three']);
+
+it('retrieves the first case', fn() => expect(BackedEnum::first())->toBe(BackedEnum::one));
+
+it('retrieves the first case with a closure')
+    ->expect(BackedEnum::first(fn(BackedEnum $case) => !$case->isOdd()))
+    ->toBe(BackedEnum::two);
+
+it('retrieves the result of mapping over all the cases', function() {
+    $cases = $keys = [];
+
+    $mapped = BackedEnum::map(function(BackedEnum $case, int $key) use (&$cases, &$keys) {
+        $cases[] = $case;
+        $keys[] = $key;
+
+        return $case->color();
+    });
+
+    expect($cases)->toBe([BackedEnum::one, BackedEnum::two, BackedEnum::three])
+        ->and($keys)->toBe([0, 1, 2])
+        ->and($mapped)->toBe(['red', 'green', 'blue']);
+});
 
 it('retrieves all the values of the backed cases')
     ->expect(BackedEnum::values())
@@ -343,6 +365,65 @@ it('attempts to retrieve the case hydrated from a key using a closure')
     ->all()
     ->toBe([BackedEnum::two]);
 
+it('handles the call to an inaccessible enum method')
+    ->expect(BackedEnum::one())
+    ->toBe(1);
+
+it('fails handling the call to an invalid enum method', fn() => BackedEnum::four())
+    ->throws(ValueError::class, '"four" is not a valid name for enum "Cerbero\Enum\BackedEnum"');
+
+it('runs custom logic when calling an inaccessible enum method', function() {
+    Enums::onStaticCall(function(string $enum, string $name, array $arguments) {
+        expect($enum)->toBe(BackedEnum::class)
+            ->and($name)->toBe('unknownStaticMethod')
+            ->and($arguments)->toBe([1, 2, 3]);
+
+        return 'ciao';
+    });
+
+    expect(BackedEnum::unknownStaticMethod(1, 2, 3))->toBe('ciao');
+
+    (fn() => static::$onStaticCall = null)->bindTo(null, Enums::class)();
+});
+
+it('handles the call to an inaccessible case method', fn() => BackedEnum::one->unknownMethod())
+    ->throws(Error::class, 'Call to undefined method Cerbero\Enum\BackedEnum::one->unknownMethod()');
+
+it('runs custom logic when calling an inaccessible case method', function() {
+    Enums::onCall(function(object $case, string $name, array $arguments) {
+        expect($case)->toBeInstanceOf(BackedEnum::class)
+            ->and($name)->toBe('unknownMethod')
+            ->and($arguments)->toBe([1, 2, 3]);
+
+        return 'ciao';
+    });
+
+    expect(BackedEnum::one->unknownMethod(1, 2, 3))->toBe('ciao');
+
+    (fn() => self::$onCall = null)->bindTo(null, Enums::class)();
+});
+
+it('handles the invocation of a case')
+    ->expect((BackedEnum::one)())
+    ->toBe(1);
+
+it('runs custom logic when invocating a case', function() {
+    Enums::onInvoke(function(object $case, mixed ...$arguments) {
+        expect($case)->toBeInstanceOf(BackedEnum::class)
+            ->and($arguments)->toBe([1, 2, 3]);
+
+        return 'ciao';
+    });
+
+    expect((BackedEnum::one)(1, 2, 3))->toBe('ciao');
+
+    (fn() => self::$onInvoke = null)->bindTo(null, Enums::class)();
+});
+
+it('retrieves the keys of an enum', function() {
+    expect(BackedEnum::keys())->toBe(['name', 'value', 'color', 'shape', 'isOdd']);
+});
+
 it('retrieves the key of a case')
     ->expect(fn(string $key, mixed $value) => BackedEnum::one->resolveKey($key) === $value)
     ->toBeTrue()
@@ -359,3 +440,7 @@ it('retrieves the key of a case using a closure')
 
 it('throws a value error when attempting to retrieve an invalid key', fn() => BackedEnum::one->resolveKey('invalid'))
     ->throws(ValueError::class, '"invalid" is not a valid key for enum "Cerbero\Enum\BackedEnum"');
+
+it('retrieves the value of a backed case or the name of a pure case', function() {
+    expect(BackedEnum::one->value())->toBe(1);
+});
