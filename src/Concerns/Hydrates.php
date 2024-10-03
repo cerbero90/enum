@@ -65,7 +65,7 @@ trait Hydrates
      * @return CasesCollection<array-key, self>
      * @throws ValueError
      */
-    public static function fromKey(callable|string $key, mixed $value): CasesCollection
+    public static function fromKey(callable|string $key, mixed $value = true): CasesCollection
     {
         if ($cases = self::tryFromKey($key, $value)) {
             return $cases;
@@ -82,7 +82,7 @@ trait Hydrates
      * @param (callable(self): mixed)|string $key
      * @return ?CasesCollection<array-key, self>
      */
-    public static function tryFromKey(callable|string $key, mixed $value): ?CasesCollection
+    public static function tryFromKey(callable|string $key, mixed $value = true): ?CasesCollection
     {
         $cases = [];
 
