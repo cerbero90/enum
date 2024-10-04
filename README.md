@@ -182,7 +182,7 @@ BackedEnum::tryFromKey('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Thr
 BackedEnum::tryFromKey(fn(BackedEnum $case) => $case->isOdd()); // CasesCollection[BackedEnum::One, BackedEnum::Three]
 ```
 
-Hydrating from keys may return multiple cases. To facilitate further processing, such cases are [collected into a `CasesCollection`](#cases-collection).
+Hydrating from keys may return multiple cases. To facilitate further processing, such cases are [collected into a `CasesCollection`](#-cases-collection).
 
 
 ### 🎲 Enum operations
