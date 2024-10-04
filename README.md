@@ -135,13 +135,6 @@ enum BackedEnum: int
 }
 ```
 
-We can see the keys belonging to an enum by calling the `keys()` method:
-
-```php
-// ['name', 'value', 'color', 'isOdd']
-$keys = BackedEnum::keys();
-```
-
 Keys provide extra information for an enum and can also be leveraged for the [hydration](#-hydration), [elaboration](#-enum-operations) and [collection](#-cases-collection) of cases.
 
 
@@ -286,27 +279,112 @@ All the [enum operations listed above](#-enum-operations) are also available whe
 
 ### 🪄 Magic
 
-Enums can implement magic methods to be invoked or to handle calls to inaccessible methods. By default when calling an inaccessible static method, the value of the case matching the missing method is returned:
+Enums can implement magic methods to be invoked or to handle calls to inaccessible methods. By default when calling an inaccessible static method, the name or value of the case matching the missing method is returned:
 
 ```php
 PureEnum::One(); // 'One'
-PureEnum::isBacked(); // false
 
-BackedEnum::isPure(); // false
-BackedEnum::isBacked(); // true
+BackedEnum::One(); // 1
+```
+
+To improve the autocompletion of our IDE, we can add some method annotations to our enums:
+
+```php
+/**
+ * @method static int One()
+ * @method static int Two()
+ * @method static int Three()
+ */
+enum BackedEnum: int
+{
+    use Enumerates;
+
+    case One = 1;
+    case Two = 2;
+    case Three = 3;
+}
+```
+
+By default, we can also obtain the name or value of a case by simply invoking it:
+
+```php
+$case = PureEnum::One;
+$case(); // 'One'
+
+$case = BackedEnum::One;
+$case(); // 1
+```
+
+When calling an inaccessible method of a case, by default the value of the key matching the missing method is returned:
+
+```php
+PureEnum::One->color(); // 'red'
+
+BackedEnum::One->color(); // 'red'
+```
+
+To improve the autocompletion of our IDE, we can add some method annotations to our enums:
+
+```php
+/**
+ * @method string color()
+ */
+enum BackedEnum: int
+{
+    use Enumerates;
+
+    #[Meta(color: 'red')]
+    case One = 1;
+
+    #[Meta(color: 'green')]
+    case Two = 2;
+
+    #[Meta(color: 'blue')]
+    case Three = 3;
+}
+```
+
+Depending on our needs, we can customize the default magic behavior of all enums in our application and run our own custom logic when invoking a case or calling inaccessible methods:
+
+```php
+use Cerbero\Enum\Enums;
+
+// define the logic to run when calling an inaccessible method of an enum
+Enums::onStaticCall(function(string $enum, string $name, array $arguments) {
+    // $enum is the fully qualified name of the enum that called the inaccessible method
+    // $name is the inaccessible method name
+    // $arguments are the parameters passed to the inaccessible method
+});
+
+// define the logic to run when calling an inaccessible method of a case
+Enums::onCall(function(object $case, string $name, array $arguments) {
+    // $case is the instance of the case that called the inaccessible method
+    // $name is the inaccessible method name
+    // $arguments are the parameters passed to the inaccessible method
+});
+
+// define the logic to run when invoking a case
+Enums::onInvoke(function(object $case, mixed ...$arguments) {
+    // $case is the instance of the case that is being invoked
+    // $arguments are the parameters passed when invoking the case
+});
 ```
 
 
 ### 🤳 Self-awareness
 
-These methods determine whether an enum is pure or backed:
+Finally, the following methods can be useful for inspecting enums or auto-generating code:
 
 ```php
 PureEnum::isPure(); // true
 PureEnum::isBacked(); // false
+PureEnum::keys(); // ['color', 'shape', 'isOdd']
+PureEnum::One->value(); // 'One'
 
 BackedEnum::isPure(); // false
 BackedEnum::isBacked(); // true
+BackedEnum::keys(); // ['color', 'shape', 'isOdd']
+BackedEnum::One->value(); // 1
 ```
 
 ## 📆 Change log
