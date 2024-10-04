@@ -24,7 +24,7 @@ composer require cerbero/enum
 
 ## 🔮 Usage
 
-* [⚖️ Comparison](#-comparison)
+* [⚖️ Comparison](#%EF%B8%8F-comparison)
 * [🔑 Keys](#-keys)
 * [🚰 Hydration](#-hydration)
 * [🎲 Enum operations](#-enum-operations)
