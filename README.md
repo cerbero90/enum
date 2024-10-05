@@ -25,7 +25,7 @@ composer require cerbero/enum
 ## 🔮 Usage
 
 * [⚖️ Comparison](#%EF%B8%8F-comparison)
-* [🏷️ Meta](%EF%B8%8F-meta)
+* [🏷️ Meta](#%EF%B8%8F-meta)
 * [🚰 Hydration](#-hydration)
 * [🎲 Enum operations](#-enum-operations)
 * [🧺 Cases collection](#-cases-collection)
@@ -157,7 +157,7 @@ Meta can also be leveraged for the [hydration](#-hydration), [elaboration](#-enu
 
 ### 🚰 Hydration
 
-An enum case can be instantiated from its own name, value (if backed) or [meta](%EF%B8%8F-meta):
+An enum case can be instantiated from its own name, value (if backed) or [meta](#%EF%B8%8F-meta):
 
 ```php
 PureEnum::from('One'); // PureEnum::One
@@ -186,6 +186,7 @@ BackedEnum::fromName('four'); // throws ValueError
 BackedEnum::tryFromName('One'); // BackedEnum::One
 BackedEnum::tryFromName('four'); // null
 BackedEnum::fromMeta('color', 'red'); // CasesCollection[BackedEnum::One]
+BackedEnum::fromMeta('color', 'purple'); // throws ValueError
 BackedEnum::fromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
 BackedEnum::fromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[BackedEnum::One, BackedEnum::Three]
 BackedEnum::tryFromMeta('color', 'red'); // CasesCollection[BackedEnum::One]
@@ -356,7 +357,7 @@ enum BackedEnum: int
 }
 ```
 
-Depending on our needs, we can customize the default magic behavior of all enums in our application and run our own custom logic when invoking a case or calling inaccessible methods:
+Depending on our needs, we can customize the default behavior of all enums in our application when invoking a case or calling inaccessible methods:
 
 ```php
 use Cerbero\Enum\Enums;
