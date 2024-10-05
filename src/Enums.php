@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Cerbero\Enum;
 
 use Closure;
-use Error;
 
 /**
  * The global behavior for all enums.
@@ -83,9 +82,8 @@ class Enums
      */
     public static function handleCall(object $case, string $name, array $arguments): mixed
     {
-        return static::$onCall
-            ? (static::$onCall)($case, $name, $arguments) /** @phpstan-ignore-next-line property.notFound */
-            : throw new Error(sprintf('Call to undefined method %s::%s->%s()', $case::class, $case->name, $name));
+        /** @phpstan-ignore method.notFound */
+        return static::$onCall ? (static::$onCall)($case, $name, $arguments) : $case->resolveMetaAttribute($name);
     }
 
     /**

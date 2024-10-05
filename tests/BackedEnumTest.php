@@ -100,7 +100,7 @@ it('retrieves a collection with the filtered cases')
     ->all()
     ->toBe([BackedEnum::one, BackedEnum::two]);
 
-it('retrieves a collection with cases filtered by a key', function () {
+it('retrieves a collection with cases filtered by a meta', function () {
     expect(BackedEnum::filter('isOdd'))
         ->toBeInstanceOf(CasesCollection::class)
         ->all()
@@ -330,37 +330,36 @@ it('retrieves the case hydrated from a name or returns null')
         ['four', null],
     ]);
 
-it('retrieves the cases hydrated from a key')
-    ->expect(fn(string $key, mixed $value, array $cases) => BackedEnum::fromKey($key, $value)->all() === $cases)
+it('retrieves the cases hydrated from a meta')
+    ->expect(fn(string $meta, mixed $value, array $cases) => BackedEnum::fromMeta($meta, $value)->all() === $cases)
     ->toBeTrue()
     ->with([
         ['color', 'red', [BackedEnum::one]],
-        ['name', 'three', [BackedEnum::three]],
+        ['shape', 'circle', [BackedEnum::three]],
         ['isOdd', true, [BackedEnum::one, BackedEnum::three]],
     ]);
 
-it('retrieves the cases hydrated from a key using a closure')
-    ->expect(BackedEnum::fromKey(fn(BackedEnum $case) => $case->shape(), 'square'))
+it('retrieves the cases hydrated from a meta using a closure')
+    ->expect(BackedEnum::fromMeta('shape', fn(string $shape) => $shape == 'square'))
     ->toBeInstanceOf(CasesCollection::class)
     ->all()
     ->toBe([BackedEnum::two]);
 
-it('throws a value error when hydrating cases with an invalid key', fn() => BackedEnum::fromKey('color', 'orange'))
-    ->throws(ValueError::class, 'Invalid value for the key "color" for enum "Cerbero\Enum\BackedEnum"');
+it('throws a value error when hydrating cases with an invalid meta', fn() => BackedEnum::fromMeta('color', 'orange'))
+    ->throws(ValueError::class, 'Invalid value for the meta "color" for enum "Cerbero\Enum\BackedEnum"');
 
-it('retrieves the case hydrated from a key or returns null')
-    ->expect(fn(string $key, mixed $value, ?array $cases) => BackedEnum::tryFromKey($key, $value)?->all() === $cases)
+it('retrieves the case hydrated from a meta or returns null')
+    ->expect(fn(string $meta, mixed $value, ?array $cases) => BackedEnum::tryFromMeta($meta, $value)?->all() === $cases)
     ->toBeTrue()
     ->not->toThrow(ValueError::class)
     ->with([
         ['color', 'red', [BackedEnum::one]],
-        ['name', 'three', [BackedEnum::three]],
         ['isOdd', true, [BackedEnum::one, BackedEnum::three]],
         ['shape', 'rectangle', null],
     ]);
 
-it('attempts to retrieve the case hydrated from a key using a closure')
-    ->expect(BackedEnum::tryFromKey(fn(BackedEnum $case) => $case->shape(), 'square'))
+it('attempts to retrieve the case hydrated from a meta using a closure')
+    ->expect(BackedEnum::tryFromMeta('shape', fn(string $shape) => $shape == 'square'))
     ->toBeInstanceOf(CasesCollection::class)
     ->all()
     ->toBe([BackedEnum::two]);
@@ -387,7 +386,7 @@ it('runs custom logic when calling an inaccessible enum method', function() {
 });
 
 it('handles the call to an inaccessible case method', fn() => BackedEnum::one->unknownMethod())
-    ->throws(Error::class, 'Call to undefined method Cerbero\Enum\BackedEnum::one->unknownMethod()');
+    ->throws(Error::class, '"unknownMethod" is not a valid meta for enum "Cerbero\Enum\BackedEnum"');
 
 it('runs custom logic when calling an inaccessible case method', function() {
     Enums::onCall(function(object $case, string $name, array $arguments) {
@@ -420,12 +419,12 @@ it('runs custom logic when invocating a case', function() {
     (fn() => self::$onInvoke = null)->bindTo(null, Enums::class)();
 });
 
-it('retrieves the keys of an enum', function() {
-    expect(BackedEnum::keys())->toBe(['name', 'value', 'color', 'shape', 'isOdd']);
+it('retrieves the meta names of an enum', function() {
+    expect(BackedEnum::metaNames())->toBe(['color', 'shape', 'isOdd']);
 });
 
-it('retrieves the key of a case')
-    ->expect(fn(string $key, mixed $value) => BackedEnum::one->resolveKey($key) === $value)
+it('retrieves a case item')
+    ->expect(fn(string $item, mixed $value) => BackedEnum::one->resolveCaseItem($item) === $value)
     ->toBeTrue()
     ->with([
         ['name', 'one'],
@@ -434,12 +433,12 @@ it('retrieves the key of a case')
         ['shape', 'triangle'],
     ]);
 
-it('retrieves the key of a case using a closure')
-    ->expect(BackedEnum::one->resolveKey(fn(BackedEnum $case) => $case->color()))
+it('retrieves the item of a case using a closure')
+    ->expect(BackedEnum::one->resolveCaseItem(fn(BackedEnum $case) => $case->color()))
     ->toBe('red');
 
-it('throws a value error when attempting to retrieve an invalid key', fn() => BackedEnum::one->resolveKey('invalid'))
-    ->throws(ValueError::class, '"invalid" is not a valid key for enum "Cerbero\Enum\BackedEnum"');
+it('throws a value error when attempting to retrieve an invalid item', fn() => BackedEnum::one->resolveCaseItem('invalid'))
+    ->throws(ValueError::class, '"invalid" is not a valid meta for enum "Cerbero\Enum\BackedEnum"');
 
 it('retrieves the value of a backed case or the name of a pure case', function() {
     expect(BackedEnum::one->value())->toBe(1);

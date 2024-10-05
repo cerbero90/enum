@@ -3,9 +3,11 @@
 namespace Cerbero\Enum\Concerns;
 
 use BackedEnum;
-use ReflectionClass;
+use Cerbero\Enum\Attributes\Meta;
+use ReflectionAttribute;
+use ReflectionEnum;
+use ReflectionEnumUnitCase;
 use ReflectionMethod;
-use Throwable;
 use ValueError;
 
 /**
@@ -30,42 +32,93 @@ trait SelfAware
     }
 
     /**
-     * Retrieve all the keys of the enum.
+     * Retrieve all the meta names of the enum.
      *
      * @return string[]
      */
-    public static function keys(): array
+    public static function metaNames(): array
     {
-        $enum = new ReflectionClass(self::class);
-        $keys = self::isPure() ? ['name'] : ['name', 'value'];
+        $meta = [];
+        $enum = new ReflectionEnum(self::class);
 
-        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if (! $method->isStatic() && $method->getFileName() == $enum->getFileName()) {
-                $keys[] = $method->getShortName();
+        foreach ($enum->getAttributes(Meta::class) as $attribute) {
+            array_push($meta, ...$attribute->newInstance()->names());
+        }
+
+        foreach ($enum->getCases() as $case) {
+            foreach ($case->getAttributes(Meta::class) as $attribute) {
+                array_push($meta, ...$attribute->newInstance()->names());
             }
         }
 
-        return $keys;
+        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (! $method->isStatic() && $method->getFileName() == $enum->getFileName()) {
+                $meta[] = $method->getShortName();
+            }
+        }
+
+        return array_values(array_unique($meta));
     }
 
     /**
-     * Retrieve the given key of this case.
+     * Retrieve the given item of this case.
      *
-     * @template TGetValue
+     * @template TItemValue
      *
-     * @param (callable(self): TGetValue)|string $key
-     * @return TGetValue
+     * @param (callable(self): TItemValue)|string $item
+     * @return TItemValue
      * @throws ValueError
      */
-    public function resolveKey(callable|string $key): mixed
+    public function resolveCaseItem(callable|string $item): mixed
     {
-        try {
-            return is_callable($key) ? $key($this) : ($this->$key ?? $this->$key());
-        } catch (Throwable) {
-            $target = is_callable($key) ? 'The given callable' : "\"{$key}\"";
+        return match (true) {
+            is_callable($item) => $item($this),
+            property_exists($this, $item) => $this->$item,
+            default => $this->resolveMeta($item),
+        };
+    }
 
-            throw new ValueError(sprintf('%s is not a valid key for enum "%s"', $target, self::class));
+    /**
+     * Retrieve the given meta of this case.
+     *
+     * @throws ValueError
+     */
+    public function resolveMeta(string $meta): mixed
+    {
+        $enum = new ReflectionEnum($this);
+        $enumFileName = $enum->getFileName();
+
+        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (! $method->isStatic() && $method->getFileName() == $enumFileName && $method->getShortName() == $meta) {
+                return $this->$meta();
+            }
         }
+
+        return $this->resolveMetaAttribute($meta);
+    }
+
+    /**
+     * Retrieve the given meta from the attributes.
+     *
+     * @throws ValueError
+     */
+    public function resolveMetaAttribute(string $meta): mixed
+    {
+        $case = new ReflectionEnumUnitCase($this, $this->name);
+
+        foreach ($case->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            if (($metadata = $attribute->newInstance())->has($meta)) {
+                return $metadata->get($meta);
+            }
+        }
+
+        foreach ($case->getEnum()->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            if (($metadata = $attribute->newInstance())->has($meta)) {
+                return $metadata->get($meta);
+            }
+        }
+
+        throw new ValueError(sprintf('"%s" is not a valid meta for enum "%s"', $meta, self::class));
     }
 
     /**

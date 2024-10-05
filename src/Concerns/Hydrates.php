@@ -59,35 +59,33 @@ trait Hydrates
     }
 
     /**
-     * Retrieve all the cases hydrated from the given key or fail.
+     * Retrieve all the cases hydrated from the given meta or fail.
      *
-     * @param (callable(self): mixed)|string $key
      * @return CasesCollection<array-key, self>
      * @throws ValueError
      */
-    public static function fromKey(callable|string $key, mixed $value = true): CasesCollection
+    public static function fromMeta(string $meta, mixed $value = true): CasesCollection
     {
-        if ($cases = self::tryFromKey($key, $value)) {
+        if ($cases = self::tryFromMeta($meta, $value)) {
             return $cases;
         }
 
-        $target = is_callable($key) ? 'given callable key' : "key \"{$key}\"";
-
-        throw new ValueError(sprintf('Invalid value for the %s for enum "%s"', $target, self::class));
+        throw new ValueError(sprintf('Invalid value for the meta "%s" for enum "%s"', $meta, self::class));
     }
 
     /**
-     * Retrieve all the cases hydrated from the given key or NULL.
+     * Retrieve all the cases hydrated from the given meta or NULL.
      *
-     * @param (callable(self): mixed)|string $key
      * @return ?CasesCollection<array-key, self>
      */
-    public static function tryFromKey(callable|string $key, mixed $value = true): ?CasesCollection
+    public static function tryFromMeta(string $meta, mixed $value = true): ?CasesCollection
     {
         $cases = [];
 
         foreach (self::cases() as $case) {
-            if ($case->resolveKey($key) === $value) {
+            $metaValue = $case->resolveMeta($meta);
+
+            if ((is_callable($value) && $value($metaValue) === true) || $metaValue === $value) {
                 $cases[] = $case;
             }
         }
