@@ -424,7 +424,7 @@ it('retrieves the meta names of an enum', function() {
 });
 
 it('retrieves a case item')
-    ->expect(fn(string $item, mixed $value) => BackedEnum::one->resolveCaseItem($item) === $value)
+    ->expect(fn(string $item, mixed $value) => BackedEnum::one->resolveItem($item) === $value)
     ->toBeTrue()
     ->with([
         ['name', 'one'],
@@ -434,10 +434,10 @@ it('retrieves a case item')
     ]);
 
 it('retrieves the item of a case using a closure')
-    ->expect(BackedEnum::one->resolveCaseItem(fn(BackedEnum $case) => $case->color()))
+    ->expect(BackedEnum::one->resolveItem(fn(BackedEnum $case) => $case->color()))
     ->toBe('red');
 
-it('throws a value error when attempting to retrieve an invalid item', fn() => BackedEnum::one->resolveCaseItem('invalid'))
+it('throws a value error when attempting to retrieve an invalid item', fn() => BackedEnum::one->resolveItem('invalid'))
     ->throws(ValueError::class, '"invalid" is not a valid meta for enum "Cerbero\Enum\BackedEnum"');
 
 it('retrieves the value of a backed case or the name of a pure case', function() {

@@ -69,7 +69,7 @@ trait SelfAware
      * @return TItemValue
      * @throws ValueError
      */
-    public function resolveCaseItem(callable|string $item): mixed
+    public function resolveItem(callable|string $item): mixed
     {
         return match (true) {
             is_callable($item) => $item($this),

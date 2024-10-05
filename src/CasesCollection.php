@@ -130,9 +130,9 @@ class CasesCollection implements Countable, IteratorAggregate
 
         foreach ($this->cases as $case) {
             if ($key === null) {
-                $result[] = $case->resolveCaseItem($value);
+                $result[] = $case->resolveItem($value);
             } else {
-                $result[$case->resolveCaseItem($key)] = $case->resolveCaseItem($value);
+                $result[$case->resolveItem($key)] = $case->resolveItem($value);
             }
         }
 
@@ -173,7 +173,7 @@ class CasesCollection implements Countable, IteratorAggregate
         $keyed = [];
 
         foreach ($this->cases as $case) {
-            $keyed[$case->resolveCaseItem($key)] = $case;
+            $keyed[$case->resolveItem($key)] = $case;
         }
 
         return new static($keyed);
@@ -197,7 +197,7 @@ class CasesCollection implements Countable, IteratorAggregate
         $grouped = [];
 
         foreach ($this->cases as $case) {
-            $grouped[$case->resolveCaseItem($key)][] = $case;
+            $grouped[$case->resolveItem($key)][] = $case;
         }
 
         foreach ($grouped as $key => $cases) {
@@ -215,7 +215,7 @@ class CasesCollection implements Countable, IteratorAggregate
     public function filter(callable|string $filter): static
     {
         /** @phpstan-ignore method.nonObject */
-        $callback = is_callable($filter) ? $filter : fn(mixed $case) => $case->resolveCaseItem($filter) === true;
+        $callback = is_callable($filter) ? $filter : fn(mixed $case) => $case->resolveItem($filter) === true;
 
         return new static(array_filter($this->cases, $callback));
     }
@@ -269,7 +269,7 @@ class CasesCollection implements Countable, IteratorAggregate
     {
         $cases = $this->cases;
 
-        uasort($cases, fn(mixed $a, mixed $b) => $a->resolveCaseItem($key) <=> $b->resolveCaseItem($key));
+        uasort($cases, fn(mixed $a, mixed $b) => $a->resolveItem($key) <=> $b->resolveItem($key));
 
         return new static($cases);
     }
@@ -299,7 +299,7 @@ class CasesCollection implements Countable, IteratorAggregate
     {
         $cases = $this->cases;
 
-        uasort($cases, fn(mixed $a, mixed $b) => $b->resolveCaseItem($key) <=> $a->resolveCaseItem($key));
+        uasort($cases, fn(mixed $a, mixed $b) => $b->resolveItem($key) <=> $a->resolveItem($key));
 
         return new static($cases);
     }
