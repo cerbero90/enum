@@ -173,7 +173,7 @@ PureEnum::fromMeta('color', 'purple'); // throws ValueError
 PureEnum::fromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
 PureEnum::fromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[PureEnum::One, PureEnum::Three]
 PureEnum::tryFromMeta('color', 'red'); // CasesCollection[PureEnum::One]
-PureEnum::fromMeta('color', 'purple'); // null
+PureEnum::tryFromMeta('color', 'purple'); // null
 PureEnum::tryFromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
 PureEnum::tryFromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[PureEnum::One, PureEnum::Three]
 
@@ -189,6 +189,7 @@ BackedEnum::fromMeta('color', 'red'); // CasesCollection[BackedEnum::One]
 BackedEnum::fromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
 BackedEnum::fromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[BackedEnum::One, BackedEnum::Three]
 BackedEnum::tryFromMeta('color', 'red'); // CasesCollection[BackedEnum::One]
+BackedEnum::tryFromMeta('color', 'purple'); // null
 BackedEnum::tryFromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
 BackedEnum::tryFromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[BackedEnum::One, BackedEnum::Three]
 ```
