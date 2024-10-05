@@ -25,7 +25,7 @@ composer require cerbero/enum
 ## 🔮 Usage
 
 * [⚖️ Comparison](#%EF%B8%8F-comparison)
-* [🔑 Keys](#-keys)
+* [🏷️ Meta](#-meta)
 * [🚰 Hydration](#-hydration)
 * [🎲 Enum operations](#-enum-operations)
 * [🧺 Cases collection](#-cases-collection)
@@ -106,27 +106,23 @@ BackedEnum::One->notIn(['One', 'four']); // true
 ```
 
 
-### 🔑 Keys
+### 🏷️ Meta
 
-With the term "key" we refer to any element defined for an enum case, such as its name, value or public methods:
+Meta add extra information to a case. Meta can be added by implementing a public non-static method and/or by attaching `#[Meta]` attributes to cases:
 
 ```php
 enum BackedEnum: int
 {
     use Enumerates;
 
+    #[Meta(color: 'red', shape: 'triangle')]
     case One = 1;
-    case Two = 2;
-    case Three = 3;
 
-    public function color(): string
-    {
-        return match ($this) {
-            self::One => 'red',
-            self::Two => 'green',
-            self::Three => 'blue',
-        };
-    }
+    #[Meta(color: 'green', shape: 'square')]
+    case Two = 2;
+
+    #[Meta(color: 'blue', shape: 'circle')]
+    case Three = 3;
 
     public function isOdd(): bool
     {
@@ -135,12 +131,33 @@ enum BackedEnum: int
 }
 ```
 
-Keys provide extra information for an enum and can also be leveraged for the [hydration](#-hydration), [elaboration](#-enum-operations) and [collection](#-cases-collection) of cases.
+The above enum has 3 meta defined for each case: `color`, `shape` and `isOdd`. Meta defined via the `#[Meta]` attribute are ideal to declare static information, whilst meta defined via public non-static methods are ideal to declare dynamic information.
+
+The `#[Meta]` attribute can also be attached to the enum itself to provide default meta values when a case does not declare its own meta value:
+
+```php
+#[Meta(color: 'red', shape: 'triangle')]
+enum BackedEnum: int
+{
+    use Enumerates;
+
+    case One = 1;
+
+    #[Meta(color: 'green', shape: 'square')]
+    case Two = 2;
+
+    case Three = 3;
+}
+```
+
+In the above example all cases have a `red` color and a `triangle` shape, except the case `Two` that overrides the default meta values of the enum.
+
+Meta can also be leveraged for the [hydration](#-hydration), [elaboration](#-enum-operations) and [collection](#-cases-collection) of cases.
 
 
 ### 🚰 Hydration
 
-An enum case can be instantiated from its own name, value (if backed) or [keys](#-keys):
+An enum case can be instantiated from its own name, value (if backed) or [meta](#-meta):
 
 ```php
 PureEnum::from('One'); // PureEnum::One
@@ -151,16 +168,14 @@ PureEnum::fromName('One'); // PureEnum::One
 PureEnum::fromName('four'); // throws ValueError
 PureEnum::tryFromName('One'); // PureEnum::One
 PureEnum::tryFromName('four'); // null
-PureEnum::fromKey('name', 'One'); // CasesCollection[PureEnum::One]
-PureEnum::fromKey('value', 1); // throws ValueError
-PureEnum::fromKey('color', 'red'); // CasesCollection[PureEnum::One]
-PureEnum::fromKey('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
-PureEnum::fromKey(fn(PureEnum $case) => $case->isOdd()); // CasesCollection[PureEnum::One, PureEnum::Three]
-PureEnum::tryFromKey('name', 'One'); // CasesCollection[PureEnum::One]
-PureEnum::tryFromKey('value', 1); // null
-PureEnum::tryFromKey('color', 'red'); // CasesCollection[PureEnum::One]
-PureEnum::tryFromKey('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
-PureEnum::tryFromKey(fn(PureEnum $case) => $case->isOdd()); // CasesCollection[PureEnum::One, PureEnum::Three]
+PureEnum::fromMeta('color', 'red'); // CasesCollection[PureEnum::One]
+PureEnum::fromMeta('color', 'purple'); // throws ValueError
+PureEnum::fromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
+PureEnum::fromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[PureEnum::One, PureEnum::Three]
+PureEnum::tryFromMeta('color', 'red'); // CasesCollection[PureEnum::One]
+PureEnum::fromMeta('color', 'purple'); // null
+PureEnum::tryFromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
+PureEnum::tryFromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[PureEnum::One, PureEnum::Three]
 
 BackedEnum::from(1); // BackedEnum::One
 BackedEnum::from('1'); // throws ValueError
@@ -170,19 +185,15 @@ BackedEnum::fromName('One'); // BackedEnum::One
 BackedEnum::fromName('four'); // throws ValueError
 BackedEnum::tryFromName('One'); // BackedEnum::One
 BackedEnum::tryFromName('four'); // null
-BackedEnum::fromKey('name', 'One'); // CasesCollection[BackedEnum::One]
-BackedEnum::fromKey('value', 1); // CasesCollection[BackedEnum::One]
-BackedEnum::fromKey('color', 'red'); // CasesCollection[BackedEnum::One]
-BackedEnum::fromKey('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
-BackedEnum::fromKey(fn(BackedEnum $case) => $case->isOdd()); // CasesCollection[BackedEnum::One, BackedEnum::Three]
-BackedEnum::tryFromKey('name', 'One'); // CasesCollection[BackedEnum::One]
-BackedEnum::tryFromKey('value', 1); // CasesCollection[BackedEnum::One]
-BackedEnum::tryFromKey('color', 'red'); // CasesCollection[BackedEnum::One]
-BackedEnum::tryFromKey('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
-BackedEnum::tryFromKey(fn(BackedEnum $case) => $case->isOdd()); // CasesCollection[BackedEnum::One, BackedEnum::Three]
+BackedEnum::fromMeta('color', 'red'); // CasesCollection[BackedEnum::One]
+BackedEnum::fromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
+BackedEnum::fromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[BackedEnum::One, BackedEnum::Three]
+BackedEnum::tryFromMeta('color', 'red'); // CasesCollection[BackedEnum::One]
+BackedEnum::tryFromMeta('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
+BackedEnum::tryFromMeta('shape', fn(string $shape) => in_array($shape, ['square', 'circle'])); // CasesCollection[BackedEnum::One, BackedEnum::Three]
 ```
 
-Hydrating from keys may return multiple cases. To facilitate further processing, such cases are [collected into a `CasesCollection`](#-cases-collection).
+Hydrating from meta can return multiple cases. To facilitate further processing, such cases are [collected into a `CasesCollection`](#-cases-collection).
 
 
 ### 🎲 Enum operations
@@ -315,12 +326,12 @@ $case = BackedEnum::One;
 $case(); // 1
 ```
 
-When calling an inaccessible method of a case, by default the value of the key matching the missing method is returned:
+When calling an inaccessible method of a case, by default the value of the meta matching the missing method is returned:
 
 ```php
 PureEnum::One->color(); // 'red'
 
-BackedEnum::One->color(); // 'red'
+BackedEnum::One->shape(); // 'triangle'
 ```
 
 To improve the autocompletion of our IDE, we can add some method annotations to our enums:
@@ -378,12 +389,18 @@ Finally, the following methods can be useful for inspecting enums or auto-genera
 ```php
 PureEnum::isPure(); // true
 PureEnum::isBacked(); // false
-PureEnum::keys(); // ['color', 'shape', 'isOdd']
+PureEnum::metaNames(); // ['color', 'shape', 'isOdd']
+PureEnum::One->resolveItem('name'); // 'One'
+PureEnum::One->resolveMeta('isOdd'); // true
+PureEnum::One->resolveMetaAttribute('color'); // 'red'
 PureEnum::One->value(); // 'One'
 
 BackedEnum::isPure(); // false
 BackedEnum::isBacked(); // true
-BackedEnum::keys(); // ['color', 'shape', 'isOdd']
+BackedEnum::metaNames(); // ['color', 'shape', 'isOdd']
+BackedEnum::One->resolveItem('value'); // 1
+BackedEnum::One->resolveMeta('isOdd'); // true
+BackedEnum::One->resolveMetaAttribute('color'); // 'red'
 BackedEnum::One->value(); // 1
 ```
 
