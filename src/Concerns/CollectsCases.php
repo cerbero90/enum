@@ -5,219 +5,237 @@ namespace Cerbero\Enum\Concerns;
 use Cerbero\Enum\CasesCollection;
 
 /**
- * The trait to collect cases of an enum.
- *
+ * The trait to collect the cases of an enum.
  */
 trait CollectsCases
 {
     /**
-     * Retrieve a collection with all the cases
+     * Retrieve a collection with all the cases.
      *
-     * @return CasesCollection
+     * @return CasesCollection<array-key, self>
      */
     public static function collect(): CasesCollection
     {
-        return new CasesCollection(static::cases());
+        return new CasesCollection(self::cases());
     }
 
     /**
-     * Retrieve the count of cases
-     *
-     * @return int
+     * Retrieve the count of cases.
      */
     public static function count(): int
     {
-        return static::collect()->count();
+        return self::collect()->count();
     }
 
     /**
-     * Retrieve all cases keyed by name
+     * Retrieve the first case.
      *
-     * @return array<string, mixed>
+     * @param (callable(self, array-key): bool)|null $callback
      */
-    public static function casesByName(): array
+    public static function first(callable $callback = null): ?self
     {
-        return static::collect()->keyByName();
+        return self::collect()->first($callback);
     }
 
     /**
-     * Retrieve all cases keyed by value
+     * Retrieve the name of all the cases.
      *
-     * @return array<string|int, mixed>
-     */
-    public static function casesByValue(): array
-    {
-        return static::collect()->keyByValue();
-    }
-
-    /**
-     * Retrieve all cases keyed by the given key
-     *
-     * @param callable|string $key
-     * @return array
-     */
-    public static function casesBy(callable|string $key): array
-    {
-        return static::collect()->keyBy($key);
-    }
-
-    /**
-     * Retrieve all cases grouped by the given key
-     *
-     * @param callable|string $key
-     * @return array
-     */
-    public static function groupBy(callable|string $key): array
-    {
-        return static::collect()->groupBy($key);
-    }
-
-    /**
-     * Retrieve all the names of the cases
-     *
-     * @return array<int, string>
+     * @return string[]
      */
     public static function names(): array
     {
-        return static::collect()->names();
+        return self::collect()->names();
     }
 
     /**
-     * Retrieve all the values of the backed cases
+     * Retrieve the value of all the backed cases.
      *
-     * @return array<int, mixed>
+     * @return list<string|int>
      */
     public static function values(): array
     {
-        return static::collect()->values();
+        return self::collect()->values();
     }
 
     /**
-     * Retrieve a collection with the filtered cases
+     * Retrieve an array of values optionally keyed by the given key.
      *
-     * @param callable|string $filter
-     * @return CasesCollection
+     * @template TPluckValue
+     *
+     * @param (callable(self): TPluckValue)|string $value
+     * @param (callable(self): array-key)|string|null $key
+     * @return array<array-key, TPluckValue>
+     */
+    public static function pluck(callable|string $value, callable|string $key = null): array
+    {
+        return self::collect()->pluck($value, $key);
+    }
+
+    /**
+     * Retrieve the result of mapping over all the cases.
+     *
+     * @template TMapValue
+     *
+     * @param callable(self, array-key): TMapValue $callback
+     * @return array<array-key, TMapValue>
+     */
+    public static function map(callable $callback): array
+    {
+        return self::collect()->map($callback);
+    }
+
+    /**
+     * Retrieve all the cases keyed by their own name.
+     *
+     * @return CasesCollection<array-key, self>
+     */
+    public static function keyByName(): CasesCollection
+    {
+        return self::collect()->keyByName();
+    }
+
+    /**
+     * Retrieve all the cases keyed by the given key.
+     *
+     * @param (callable(self): array-key)|string $key
+     * @return CasesCollection<array-key, self>
+     */
+    public static function keyBy(callable|string $key): CasesCollection
+    {
+        return self::collect()->keyBy($key);
+    }
+
+    /**
+     * Retrieve all the cases keyed by their own value.
+     *
+     * @return CasesCollection<array-key, self>
+     */
+    public static function keyByValue(): CasesCollection
+    {
+        return self::collect()->keyByValue();
+    }
+
+    /**
+     * Retrieve all the cases grouped by the given key.
+     *
+     * @param (callable(self): array-key)|string $key
+     * @return CasesCollection<array-key, CasesCollection<array-key, self>>
+     */
+    public static function groupBy(callable|string $key): CasesCollection
+    {
+        return self::collect()->groupBy($key);
+    }
+
+    /**
+     * Retrieve only the filtered cases.
+     *
+     * @param (callable(self): bool)|string $filter
+     * @return CasesCollection<array-key, self>
      */
     public static function filter(callable|string $filter): CasesCollection
     {
-        return static::collect()->filter($filter);
+        return self::collect()->filter($filter);
     }
 
     /**
-     * Retrieve a collection of cases having the given names
+     * Retrieve only the cases having the given names.
      *
-     * @param string ...$name
-     * @return CasesCollection
+     * @return CasesCollection<array-key, self>
      */
-    public static function only(string ...$name): CasesCollection
+    public static function only(string ...$names): CasesCollection
     {
-        return static::collect()->only(...$name);
+        return self::collect()->only(...$names);
     }
 
     /**
-     * Retrieve a collection of cases not having the given names
+     * Retrieve only the cases not having the given names.
      *
-     * @param string ...$name
-     * @return CasesCollection
+     * @return CasesCollection<array-key, self>
      */
-    public static function except(string ...$name): CasesCollection
+    public static function except(string ...$names): CasesCollection
     {
-        return static::collect()->except(...$name);
+        return self::collect()->except(...$names);
     }
 
     /**
-     * Retrieve a collection of backed cases having the given values
+     * Retrieve only the cases having the given values.
      *
-     * @param string|int ...$value
-     * @return CasesCollection
+     * @return CasesCollection<array-key, self>
      */
-    public static function onlyValues(string|int ...$value): CasesCollection
+    public static function onlyValues(string|int ...$values): CasesCollection
     {
-        return static::collect()->onlyValues(...$value);
+        return self::collect()->onlyValues(...$values);
     }
 
     /**
-     * Retrieve a collection of backed cases not having the given values
+     * Retrieve only the cases not having the given values.
      *
-     * @param string|int ...$value
-     * @return CasesCollection
+     * @return CasesCollection<array-key, self>
      */
-    public static function exceptValues(string|int ...$value): CasesCollection
+    public static function exceptValues(string|int ...$values): CasesCollection
     {
-        return static::collect()->exceptValues(...$value);
+        return self::collect()->exceptValues(...$values);
     }
 
     /**
-     * Retrieve an array of values optionally keyed by the given key
+     * Retrieve all the cases sorted by their own name ascending.
      *
-     * @param callable|string|null $value
-     * @param callable|string|null $key
-     * @return array
-     */
-    public static function pluck(callable|string $value = null, callable|string $key = null): array
-    {
-        return static::collect()->pluck($value, $key);
-    }
-
-    /**
-     * Retrieve a collection of cases sorted by name ascending
-     *
-     * @return CasesCollection
+     * @return CasesCollection<array-key, self>
      */
     public static function sort(): CasesCollection
     {
-        return static::collect()->sort();
+        return self::collect()->sort();
     }
 
     /**
-     * Retrieve a collection of cases sorted by name descending
+     * Retrieve all the cases sorted by the given key ascending.
      *
-     * @return CasesCollection
-     */
-    public static function sortDesc(): CasesCollection
-    {
-        return static::collect()->sortDesc();
-    }
-
-    /**
-     * Retrieve a collection of cases sorted by value ascending
-     *
-     * @return CasesCollection
-     */
-    public static function sortByValue(): CasesCollection
-    {
-        return static::collect()->sortByValue();
-    }
-
-    /**
-     * Retrieve a collection of cases sorted by value descending
-     *
-     * @return CasesCollection
-     */
-    public static function sortDescByValue(): CasesCollection
-    {
-        return static::collect()->sortDescByValue();
-    }
-
-    /**
-     * Retrieve a collection of cases sorted by the given key ascending
-     *
-     * @param callable|string $key
-     * @return CasesCollection
+     * @param (callable(self): mixed)|string $key
+     * @return CasesCollection<array-key, self>
      */
     public static function sortBy(callable|string $key): CasesCollection
     {
-        return static::collect()->sortBy($key);
+        return self::collect()->sortBy($key);
     }
 
     /**
-     * Retrieve a collection of cases sorted by the given key descending
+     * Retrieve all the cases sorted by their own value ascending.
      *
-     * @param callable|string $key
-     * @return CasesCollection
+     * @return CasesCollection<array-key, self>
      */
-    public static function sortDescBy(callable|string $key): CasesCollection
+    public static function sortByValue(): CasesCollection
     {
-        return static::collect()->sortDescBy($key);
+        return self::collect()->sortByValue();
+    }
+
+    /**
+     * Retrieve all the cases sorted by their own name descending.
+     *
+     * @return CasesCollection<array-key, self>
+     */
+    public static function sortDesc(): CasesCollection
+    {
+        return self::collect()->sortDesc();
+    }
+
+    /**
+     * Retrieve all the cases sorted by the given key descending.
+     *
+     * @param (callable(self): mixed)|string $key
+     * @return CasesCollection<array-key, self>
+     */
+    public static function sortByDesc(callable|string $key): CasesCollection
+    {
+        return self::collect()->sortByDesc($key);
+    }
+
+    /**
+     * Retrieve all the cases sorted by their own value descending.
+     *
+     * @return CasesCollection<array-key, self>
+     */
+    public static function sortByDescValue(): CasesCollection
+    {
+        return self::collect()->sortByDescValue();
     }
 }

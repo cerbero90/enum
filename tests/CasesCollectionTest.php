@@ -3,16 +3,22 @@
 use Cerbero\Enum\BackedEnum;
 use Cerbero\Enum\CasesCollection;
 use Cerbero\Enum\PureEnum;
+use Pest\Expectation;
 
 it('retrieves all the cases')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->cases()
+    ->all()
     ->toBe([PureEnum::one, PureEnum::two, PureEnum::three]);
 
 it('retrieves the count of all the cases')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->count()
     ->toBe(3);
+
+it('retrieves all the cases as a plain array recursively')
+    ->expect((new CasesCollection(PureEnum::cases()))->groupBy('isOdd'))
+    ->toArray()
+    ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
 
 it('retrieves the first case')
     ->expect(new CasesCollection(PureEnum::cases()))
@@ -21,7 +27,7 @@ it('retrieves the first case')
 
 it('retrieves the first case with a closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->first(fn (PureEnum $case) => !$case->isOdd())
+    ->first(fn(PureEnum $case) => !$case->isOdd())
     ->toBe(PureEnum::two);
 
 it('returns null if no case is present')
@@ -29,29 +35,37 @@ it('returns null if no case is present')
     ->first()
     ->toBeNull();
 
-it('returns a default value if no case is present')
-    ->expect(new CasesCollection([]))
-    ->first(default: PureEnum::one)
-    ->toBe(PureEnum::one);
+it('retrieves the result of mapping over the cases')
+    ->expect(new CasesCollection(PureEnum::cases()))
+    ->map(fn(PureEnum $case) => $case->color())
+    ->toBe(['red', 'green', 'blue']);
 
 it('retrieves the cases keyed by name')
-    ->expect(new CasesCollection(PureEnum::cases()))
-    ->keyByName()
+    ->expect((new CasesCollection(PureEnum::cases()))->keyByName())
+    ->toBeInstanceOf(CasesCollection::class)
+    ->all()
     ->toBe(['one' => PureEnum::one, 'two' => PureEnum::two, 'three' => PureEnum::three]);
 
 it('retrieves the cases keyed by a custom key')
-    ->expect(new CasesCollection(PureEnum::cases()))
-    ->keyBy('color')
+    ->expect((new CasesCollection(PureEnum::cases()))->keyBy('color'))
+    ->toBeInstanceOf(CasesCollection::class)
+    ->all()
     ->toBe(['red' => PureEnum::one, 'green' => PureEnum::two, 'blue' => PureEnum::three]);
 
 it('retrieves the cases keyed by a custom closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->keyBy(fn (PureEnum $case) => $case->shape())
-    ->toBe(['triangle' => PureEnum::one, 'square' => PureEnum::two, 'circle' => PureEnum::three]);
+    ->keyBy(fn(PureEnum $case) => $case->shape())
+    ->toBeInstanceOf(CasesCollection::class)
+    ->sequence(
+        fn(Expectation $case, Expectation $key) => $key->toBe('triangle')->and($case)->toBe(PureEnum::one),
+        fn(Expectation $case, Expectation $key) => $key->toBe('square')->and($case)->toBe(PureEnum::two),
+        fn(Expectation $case, Expectation $key) => $key->toBe('circle')->and($case)->toBe(PureEnum::three),
+    );
 
-it('retrieves the cases keyed by value')
-    ->expect(new CasesCollection(BackedEnum::cases()))
-    ->keyByValue()
+it('retrieves the cases keyed by value xxxxxxx')
+    ->expect((new CasesCollection(BackedEnum::cases()))->keyByValue())
+    ->toBeInstanceOf(CasesCollection::class)
+    ->all()
     ->toBe([1 => BackedEnum::one, 2 => BackedEnum::two, 3 => BackedEnum::three]);
 
 it('retrieves an empty array when trying to key cases by value belonging to a pure enum')
@@ -62,12 +76,21 @@ it('retrieves an empty array when trying to key cases by value belonging to a pu
 it('retrieves the cases grouped by a custom key')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->groupBy('color')
-    ->toBe(['red' => [PureEnum::one], 'green' => [PureEnum::two], 'blue' => [PureEnum::three]]);
+    ->toBeInstanceOf(CasesCollection::class)
+    ->sequence(
+        fn(Expectation $cases, Expectation $key) => $key->toBe('red')->and($cases)->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::one]),
+        fn(Expectation $cases, Expectation $key) => $key->toBe('green')->and($cases)->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::two]),
+        fn(Expectation $cases, Expectation $key) => $key->toBe('blue')->and($cases)->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::three]),
+    );
 
 it('retrieves the cases grouped by a custom closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->groupBy(fn (PureEnum $case) => $case->isOdd())
-    ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
+    ->groupBy(fn(PureEnum $case) => $case->isOdd())
+    ->toBeInstanceOf(CasesCollection::class)
+    ->sequence(
+        fn(Expectation $cases) => $cases->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::one, PureEnum::three]),
+        fn(Expectation $cases) => $cases->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::two]),
+    );
 
 it('retrieves all the names of the cases')
     ->expect(new CasesCollection(PureEnum::cases()))
@@ -84,14 +107,14 @@ it('retrieves an empty array when trying to retrieve values belonging to a pure 
     ->values()
     ->toBeEmpty();
 
-it('retrieves a list of names by default when plucking a pure enum')
+it('retrieves a list of names')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->pluck()
+    ->pluck('name')
     ->toBe(['one', 'two', 'three']);
 
-it('retrieves a list of names by default when plucking a backed enum')
+it('retrieves a list of values')
     ->expect(new CasesCollection(BackedEnum::cases()))
-    ->pluck()
+    ->pluck('value')
     ->toBe([1, 2, 3]);
 
 it('retrieves a list of custom values when plucking with an argument')
@@ -101,7 +124,7 @@ it('retrieves a list of custom values when plucking with an argument')
 
 it('retrieves a list of custom values when plucking with a closure')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->pluck(fn (PureEnum $case) => $case->shape())
+    ->pluck(fn(PureEnum $case) => $case->shape())
     ->toBe(['triangle', 'square', 'circle']);
 
 it('retrieves an associative array with custom values and keys when plucking with arguments')
@@ -111,105 +134,105 @@ it('retrieves an associative array with custom values and keys when plucking wit
 
 it('retrieves an associative array with custom values and keys when plucking with closures')
     ->expect(new CasesCollection(PureEnum::cases()))
-    ->pluck(fn (PureEnum $case) => $case->shape(), fn (PureEnum $case) => $case->color())
+    ->pluck(fn(PureEnum $case) => $case->shape(), fn(PureEnum $case) => $case->color())
     ->toBe(['red' => 'triangle', 'green' => 'square', 'blue' => 'circle']);
 
 it('retrieves a collection with filtered cases', function () {
-    expect((new CasesCollection(PureEnum::cases()))->filter(fn (PureEnum $case) => $case->isOdd()))
+    expect((new CasesCollection(PureEnum::cases()))->filter(fn(PureEnum $case) => $case->isOdd()))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([PureEnum::one, PureEnum::three]);
+        ->all()
+        ->toBe([0 => PureEnum::one, 2 => PureEnum::three]);
 });
 
 it('retrieves a collection with cases filtered by a key', function () {
     expect((new CasesCollection(PureEnum::cases()))->filter('isOdd'))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([PureEnum::one, PureEnum::three]);
+        ->all()
+        ->toBe([0 => PureEnum::one, 2 => PureEnum::three]);
 });
 
 it('retrieves a collection of cases with the given names', function () {
     expect((new CasesCollection(PureEnum::cases()))->only('one', 'three'))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([PureEnum::one, PureEnum::three]);
+        ->all()
+        ->toBe([0 => PureEnum::one, 2 => PureEnum::three]);
 });
 
 it('retrieves a collection of cases excluding the given names', function () {
     expect((new CasesCollection(PureEnum::cases()))->except('one', 'three'))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([PureEnum::two]);
+        ->all()
+        ->toBe([1 => PureEnum::two]);
 });
 
 it('retrieves a collection of cases with the given values', function () {
     expect((new CasesCollection(BackedEnum::cases()))->onlyValues(1, 3))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([BackedEnum::one, BackedEnum::three]);
+        ->all()
+        ->toBe([0 => BackedEnum::one, 2 => BackedEnum::three]);
 });
 
 it('retrieves a collection of cases excluding the given values', function () {
     expect((new CasesCollection(BackedEnum::cases()))->exceptValues(1, 3))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([BackedEnum::two]);
+        ->all()
+        ->toBe([1 => BackedEnum::two]);
 });
 
 it('retrieves an empty collection of cases when when including values of pure enums', function () {
     expect((new CasesCollection(PureEnum::cases()))->onlyValues(1, 3))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
+        ->all()
         ->toBeEmpty();
 });
 
 it('retrieves an empty collection of cases when when excluding values of pure enums', function () {
     expect((new CasesCollection(PureEnum::cases()))->exceptValues(1, 3))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
+        ->all()
         ->toBeEmpty();
 });
 
 it('retrieves a collection of cases sorted by name ascending', function () {
     expect((new CasesCollection(PureEnum::cases()))->sort())
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([PureEnum::one, PureEnum::three, PureEnum::two]);
+        ->all()
+        ->toBe([0 => PureEnum::one, 2 => PureEnum::three, 1 => PureEnum::two]);
 });
 
 it('retrieves a collection of cases sorted by name decending', function () {
     expect((new CasesCollection(PureEnum::cases()))->sortDesc())
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([PureEnum::two, PureEnum::three, PureEnum::one]);
+        ->all()
+        ->toBe([1 => PureEnum::two, 2 => PureEnum::three, 0 => PureEnum::one]);
 });
 
 it('retrieves a collection of cases sorted by a key ascending', function () {
     expect((new CasesCollection(PureEnum::cases()))->sortBy('color'))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([PureEnum::three, PureEnum::two, PureEnum::one]);
+        ->all()
+        ->toBe([2 => PureEnum::three, 1 => PureEnum::two, 0 => PureEnum::one]);
 });
 
 it('retrieves a collection of cases sorted by a key decending', function () {
-    expect((new CasesCollection(PureEnum::cases()))->sortDescBy('color'))
+    expect((new CasesCollection(PureEnum::cases()))->sortByDesc('color'))
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
+        ->all()
         ->toBe([PureEnum::one, PureEnum::two, PureEnum::three]);
 });
 
 it('retrieves a collection of cases sorted by value ascending', function () {
     expect((new CasesCollection(BackedEnum::cases()))->sortByValue())
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
+        ->all()
         ->toBe([BackedEnum::one, BackedEnum::two, BackedEnum::three]);
 });
 
 it('retrieves a collection of cases sorted by value decending', function () {
-    expect((new CasesCollection(BackedEnum::cases()))->sortDescByValue())
+    expect((new CasesCollection(BackedEnum::cases()))->sortByDescValue())
         ->toBeInstanceOf(CasesCollection::class)
-        ->cases()
-        ->toBe([BackedEnum::three, BackedEnum::two, BackedEnum::one]);
+        ->all()
+        ->toBe([2 => BackedEnum::three, 1 => BackedEnum::two, 0 => BackedEnum::one]);
 });
 
 it('retrieves the iterator', function () {

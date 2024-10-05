@@ -2,47 +2,24 @@
 
 namespace Cerbero\Enum;
 
+use Cerbero\Enum\Attributes\Meta;
 use Cerbero\Enum\Concerns\Enumerates;
 
 /**
  * The pure enum to test.
- *
  */
+#[Meta(color: 'green', shape: 'square')]
 enum PureEnum
 {
     use Enumerates;
 
+    #[Meta(color: 'red', shape: 'triangle')]
     case one;
+
     case two;
+
+    #[Meta(color: 'blue', shape: 'circle')]
     case three;
-
-    /**
-     * Retrieve the color of the case
-     *
-     * @return string
-     */
-    public function color(): string
-    {
-        return match ($this) {
-            static::one => 'red',
-            static::two => 'green',
-            static::three => 'blue',
-        };
-    }
-
-    /**
-     * Retrieve the shape of the case
-     *
-     * @return string
-     */
-    public function shape(): string
-    {
-        return match ($this) {
-            static::one => 'triangle',
-            static::two => 'square',
-            static::three => 'circle',
-        };
-    }
 
     /**
      * Retrieve whether the case is odd
@@ -51,10 +28,6 @@ enum PureEnum
      */
     public function isOdd(): bool
     {
-        return match ($this) {
-            static::one => true,
-            static::two => false,
-            static::three => true,
-        };
+        return $this->name != 'two';
     }
 }

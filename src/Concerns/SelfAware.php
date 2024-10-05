@@ -3,30 +3,129 @@
 namespace Cerbero\Enum\Concerns;
 
 use BackedEnum;
+use Cerbero\Enum\Attributes\Meta;
+use ReflectionAttribute;
+use ReflectionEnum;
+use ReflectionEnumUnitCase;
+use ReflectionMethod;
+use ValueError;
 
 /**
  * The trait to make an enum self-aware.
- *
  */
 trait SelfAware
 {
     /**
-     * Determine whether the enum is pure
-     *
-     * @return bool
+     * Determine whether the enum is pure.
      */
     public static function isPure(): bool
     {
-        return !static::isBacked();
+        return !self::isBacked();
     }
 
     /**
-     * Determine whether the enum is backed
-     *
-     * @return bool
+     * Determine whether the enum is backed.
      */
     public static function isBacked(): bool
     {
-        return is_subclass_of(static::class, BackedEnum::class);
+        return is_subclass_of(self::class, BackedEnum::class);
+    }
+
+    /**
+     * Retrieve all the meta names of the enum.
+     *
+     * @return string[]
+     */
+    public static function metaNames(): array
+    {
+        $meta = [];
+        $enum = new ReflectionEnum(self::class);
+
+        foreach ($enum->getAttributes(Meta::class) as $attribute) {
+            array_push($meta, ...$attribute->newInstance()->names());
+        }
+
+        foreach ($enum->getCases() as $case) {
+            foreach ($case->getAttributes(Meta::class) as $attribute) {
+                array_push($meta, ...$attribute->newInstance()->names());
+            }
+        }
+
+        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (! $method->isStatic() && $method->getFileName() == $enum->getFileName()) {
+                $meta[] = $method->getShortName();
+            }
+        }
+
+        return array_values(array_unique($meta));
+    }
+
+    /**
+     * Retrieve the given item of this case.
+     *
+     * @template TItemValue
+     *
+     * @param (callable(self): TItemValue)|string $item
+     * @return TItemValue
+     * @throws ValueError
+     */
+    public function resolveItem(callable|string $item): mixed
+    {
+        return match (true) {
+            is_callable($item) => $item($this),
+            property_exists($this, $item) => $this->$item,
+            default => $this->resolveMeta($item),
+        };
+    }
+
+    /**
+     * Retrieve the given meta of this case.
+     *
+     * @throws ValueError
+     */
+    public function resolveMeta(string $meta): mixed
+    {
+        $enum = new ReflectionEnum($this);
+        $enumFileName = $enum->getFileName();
+
+        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (! $method->isStatic() && $method->getFileName() == $enumFileName && $method->getShortName() == $meta) {
+                return $this->$meta();
+            }
+        }
+
+        return $this->resolveMetaAttribute($meta);
+    }
+
+    /**
+     * Retrieve the given meta from the attributes.
+     *
+     * @throws ValueError
+     */
+    public function resolveMetaAttribute(string $meta): mixed
+    {
+        $case = new ReflectionEnumUnitCase($this, $this->name);
+
+        foreach ($case->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            if (($metadata = $attribute->newInstance())->has($meta)) {
+                return $metadata->get($meta);
+            }
+        }
+
+        foreach ($case->getEnum()->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            if (($metadata = $attribute->newInstance())->has($meta)) {
+                return $metadata->get($meta);
+            }
+        }
+
+        throw new ValueError(sprintf('"%s" is not a valid meta for enum "%s"', $meta, self::class));
+    }
+
+    /**
+     * Retrieve the value of a backed case or the name of a pure case.
+     */
+    public function value(): string|int
+    {
+        return $this->value ?? $this->name;
     }
 }
