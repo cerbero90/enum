@@ -25,7 +25,7 @@ composer require cerbero/enum
 ## 🔮 Usage
 
 * [⚖️ Comparison](#%EF%B8%8F-comparison)
-* [🏷️ Meta](#-meta)
+* [🏷️ Meta](%EF%B8%8F-meta)
 * [🚰 Hydration](#-hydration)
 * [🎲 Enum operations](#-enum-operations)
 * [🧺 Cases collection](#-cases-collection)
@@ -73,7 +73,7 @@ BackedEnum::doesntHave(1); // false
 BackedEnum::doesntHave(4); // true
 ```
 
-Otherwise we can check whether cases match with a given name or value:
+Otherwise we can check whether cases match a given name or value:
 
 ```php
 PureEnum::One->is('One'); // true
@@ -131,9 +131,9 @@ enum BackedEnum: int
 }
 ```
 
-The above enum has 3 meta defined for each case: `color`, `shape` and `isOdd`. Meta defined via the `#[Meta]` attribute are ideal to declare static information, whilst meta defined via public non-static methods are ideal to declare dynamic information.
+The above enum defines 3 meta for each case: `color`, `shape` and `isOdd`. The `#[Meta]` attributes are ideal to declare static information, whilst public non-static methods are ideal to declare dynamic information.
 
-The `#[Meta]` attribute can also be attached to the enum itself to provide default meta values when a case does not declare its own meta value:
+`#[Meta]` attributes can also be attached to the enum itself to provide default values when a case does not declare its own meta values:
 
 ```php
 #[Meta(color: 'red', shape: 'triangle')]
@@ -150,14 +150,14 @@ enum BackedEnum: int
 }
 ```
 
-In the above example all cases have a `red` color and a `triangle` shape, except the case `Two` that overrides the default meta values of the enum.
+In the above example all cases have a `red` color and a `triangle` shape, except the case `Two` that overrides the default meta values.
 
 Meta can also be leveraged for the [hydration](#-hydration), [elaboration](#-enum-operations) and [collection](#-cases-collection) of cases.
 
 
 ### 🚰 Hydration
 
-An enum case can be instantiated from its own name, value (if backed) or [meta](#-meta):
+An enum case can be instantiated from its own name, value (if backed) or [meta](%EF%B8%8F-meta):
 
 ```php
 PureEnum::from('One'); // PureEnum::One
