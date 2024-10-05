@@ -7,58 +7,40 @@ use ValueError;
 
 /**
  * The trait to hydrate an enum.
- *
  */
 trait Hydrates
 {
     /**
-     * Retrieve the case hydrated from the given name (called by pure enums only)
+     * Retrieve the case hydrated from the given name or fail.
+     * This method can be called by pure enums only.
      *
-     * @param string $name
-     * @return static
      * @throws ValueError
      */
     public static function from(string $name): static
     {
-        return static::fromName($name);
+        return self::fromName($name);
     }
 
     /**
-     * Retrieve the case hydrated from the given name or NULL (called by pure enums only)
+     * Retrieve the case hydrated from the given name or fail.
      *
-     * @param string $name
-     * @return static|null
-     */
-    public static function tryFrom(string $name): ?static
-    {
-        return static::tryFromName($name);
-    }
-
-    /**
-     * Retrieve the case hydrated from the given name
-     *
-     * @param string $name
-     * @return static
      * @throws ValueError
      */
     public static function fromName(string $name): static
     {
-        if ($case = static::tryFromName($name)) {
+        if ($case = self::tryFromName($name)) {
             return $case;
         }
 
-        throw new ValueError(sprintf('"%s" is not a valid name for enum "%s"', $name, static::class));
+        throw new ValueError(sprintf('"%s" is not a valid name for enum "%s"', $name, self::class));
     }
 
     /**
-     * Retrieve the case hydrated from the given name or NULL
-     *
-     * @param string $name
-     * @return static|null
+     * Retrieve the case hydrated from the given name or NULL.
      */
     public static function tryFromName(string $name): ?static
     {
-        foreach (static::cases() as $case) {
+        foreach (self::cases() as $case) {
             if ($case->name === $name) {
                 return $case;
             }
@@ -68,37 +50,42 @@ trait Hydrates
     }
 
     /**
-     * Retrieve cases hydrated from the given key
-     *
-     * @param callable|string $key
-     * @param mixed $value
-     * @return CasesCollection
-     * @throws ValueError
+     * Retrieve the case hydrated from the given name or NULL.
+     * This method can be called by pure enums only.
      */
-    public static function fromKey(callable|string $key, mixed $value): CasesCollection
+    public static function tryFrom(string $name): ?static
     {
-        if ($result = static::tryFromKey($key, $value)) {
-            return $result;
-        }
-
-        $target = is_callable($key) ? 'given callable key' : "key \"$key\"";
-
-        throw new ValueError(sprintf('Invalid value for the %s for enum "%s"', $target, static::class));
+        return self::tryFromName($name);
     }
 
     /**
-     * Retrieve cases hydrated from the given key or NULL
+     * Retrieve all the cases hydrated from the given meta or fail.
      *
-     * @param callable|string $key
-     * @param mixed $value
-     * @return CasesCollection|null
+     * @return CasesCollection<array-key, self>
+     * @throws ValueError
      */
-    public static function tryFromKey(callable|string $key, mixed $value): CasesCollection|null
+    public static function fromMeta(string $meta, mixed $value = true): CasesCollection
+    {
+        if ($cases = self::tryFromMeta($meta, $value)) {
+            return $cases;
+        }
+
+        throw new ValueError(sprintf('Invalid value for the meta "%s" for enum "%s"', $meta, self::class));
+    }
+
+    /**
+     * Retrieve all the cases hydrated from the given meta or NULL.
+     *
+     * @return ?CasesCollection<array-key, self>
+     */
+    public static function tryFromMeta(string $meta, mixed $value = true): ?CasesCollection
     {
         $cases = [];
 
-        foreach (static::cases() as $case) {
-            if ($case->get($key) === $value) {
+        foreach (self::cases() as $case) {
+            $metaValue = $case->resolveMeta($meta);
+
+            if ((is_callable($value) && $value($metaValue) === true) || $metaValue === $value) {
                 $cases[] = $case;
             }
         }
