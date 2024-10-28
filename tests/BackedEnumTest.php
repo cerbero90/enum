@@ -3,6 +3,7 @@
 use Cerbero\Enum\CasesCollection;
 use Cerbero\Enum\BackedEnum;
 use Cerbero\Enum\Enums;
+use Cerbero\Enum\PureEnum;
 use Pest\Expectation;
 
 it('determines whether the enum is pure')
@@ -12,6 +13,13 @@ it('determines whether the enum is pure')
 it('determines whether the enum is backed')
     ->expect(BackedEnum::isBacked())
     ->toBeTrue();
+
+it('determines whether the enum is backed by integer or string', function() {
+    expect(BackedEnum::isBackedByInteger())->toBeTrue();
+    expect(BackedEnum::isBackedByString())->toBeFalse();
+    expect(PureEnum::isBackedByInteger())->toBeFalse();
+    expect(PureEnum::isBackedByString())->toBeFalse();
+});
 
 it('retrieves all the names of the cases')
     ->expect(BackedEnum::names())

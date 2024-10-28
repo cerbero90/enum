@@ -32,6 +32,22 @@ trait SelfAware
     }
 
     /**
+     * Determine whether the enum is backed by integer.
+     */
+    public static function isBackedByInteger(): bool
+    {
+        return (new ReflectionEnum(self::class))->getBackingType()?->getName() === 'int';
+    }
+
+    /**
+     * Determine whether the enum is backed by string.
+     */
+    public static function isBackedByString(): bool
+    {
+        return (new ReflectionEnum(self::class))->getBackingType()?->getName() === 'string';
+    }
+
+    /**
      * Retrieve all the meta names of the enum.
      *
      * @return string[]
