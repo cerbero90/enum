@@ -28,7 +28,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      *
      * @param array<array-key, TValue> $cases
      */
-    final public function __construct(protected array $cases)
+    final public function __construct(protected readonly array $cases)
     {
         $this->enumIsBacked = reset($cases) instanceof BackedEnum;
     }
@@ -80,6 +80,20 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     }
 
     /**
+     * Determine whether the collection contains the given case.
+     */
+    public function has(mixed $case): bool
+    {
+        foreach ($this->cases as $instance) {
+            if ($instance->is($case)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Retrieve all the cases as a plain array recursively.
      *
      * @return array<array-key, mixed>
@@ -89,7 +103,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
         $array = [];
 
         foreach ($this->cases as $key => $value) {
-            $array[$key] = $value instanceof self ? $value->toArray() : $value;
+            $array[$key] = $value instanceof static ? $value->toArray() : $value;
         }
 
         return $array;
