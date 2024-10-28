@@ -5,6 +5,8 @@ namespace Cerbero\Enum;
 use BackedEnum;
 use Countable;
 use IteratorAggregate;
+use JsonSerializable;
+use Stringable;
 use Traversable;
 
 /**
@@ -15,7 +17,7 @@ use Traversable;
  *
  * @implements IteratorAggregate<TKey, TValue>
  */
-class CasesCollection implements Countable, IteratorAggregate
+class CasesCollection implements Countable, IteratorAggregate, JsonSerializable, Stringable
 {
     /**
      * Whether the cases belong to a backed enum.
@@ -30,6 +32,24 @@ class CasesCollection implements Countable, IteratorAggregate
     final public function __construct(protected array $cases)
     {
         $this->enumIsBacked = reset($cases) instanceof BackedEnum;
+    }
+
+    /**
+     * Turn the collection into a string.
+     */
+    public function __toString(): string
+    {
+        return (string) json_encode($this->jsonSerialize());
+    }
+
+    /**
+     * Turn the collection into a JSON serializable array.
+     *
+     * @return array<TKey, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->enumIsBacked ? $this->values() : $this->names();
     }
 
     /**

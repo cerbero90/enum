@@ -5,6 +5,16 @@ use Cerbero\Enum\CasesCollection;
 use Cerbero\Enum\PureEnum;
 use Pest\Expectation;
 
+it('turns into a JSON with pure cases', function() {
+    expect((string) new CasesCollection(PureEnum::cases()))
+        ->toBe('["one","two","three"]');
+});
+
+it('turns into a JSON with backed cases', function() {
+    expect((string) new CasesCollection(BackedEnum::cases()))
+        ->toBe('[1,2,3]');
+});
+
 it('retrieves all the cases')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->all()
