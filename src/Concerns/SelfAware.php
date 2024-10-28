@@ -41,12 +41,12 @@ trait SelfAware
         $meta = [];
         $enum = new ReflectionEnum(self::class);
 
-        foreach ($enum->getAttributes(Meta::class) as $attribute) {
+        foreach ($enum->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             array_push($meta, ...$attribute->newInstance()->names());
         }
 
         foreach ($enum->getCases() as $case) {
-            foreach ($case->getAttributes(Meta::class) as $attribute) {
+            foreach ($case->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                 array_push($meta, ...$attribute->newInstance()->names());
             }
         }
