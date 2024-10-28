@@ -20,6 +20,26 @@ it('retrieves all the cases')
     ->all()
     ->toBe([PureEnum::one, PureEnum::two, PureEnum::three]);
 
+it('determines whether a pure collection contains an item', function() {
+    $collection = new CasesCollection(PureEnum::cases());
+
+    expect($collection->has(PureEnum::one))->toBeTrue();
+    expect($collection->has('one'))->toBeTrue();
+    expect($collection->has(BackedEnum::one))->toBeFalse();
+    expect($collection->has('four'))->toBeFalse();
+    expect($collection->has(1))->toBeFalse();
+});
+
+it('determines whether a backed collection contains an item', function() {
+    $collection = new CasesCollection(BackedEnum::cases());
+
+    expect($collection->has(BackedEnum::one))->toBeTrue();
+    expect($collection->has(1))->toBeTrue();
+    expect($collection->has(PureEnum::one))->toBeFalse();
+    expect($collection->has(4))->toBeFalse();
+    expect($collection->has('one'))->toBeFalse();
+});
+
 it('retrieves the count of all the cases')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->count()
