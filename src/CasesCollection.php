@@ -12,10 +12,9 @@ use Traversable;
 /**
  * The collection of enum cases.
  *
- * @template TKey of array-key
  * @template TValue
  *
- * @implements IteratorAggregate<TKey, TValue>
+ * @implements IteratorAggregate<array-key, TValue>
  */
 class CasesCollection implements Countable, IteratorAggregate, JsonSerializable, Stringable
 {
@@ -27,7 +26,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Instantiate the class.
      *
-     * @param array<TKey, TValue> $cases
+     * @param array<array-key, TValue> $cases
      */
     final public function __construct(protected array $cases)
     {
@@ -45,7 +44,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Turn the collection into a JSON serializable array.
      *
-     * @return array<TKey, mixed>
+     * @return list<string|int>
      */
     public function jsonSerialize(): array
     {
@@ -63,7 +62,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve the iterable cases.
      *
-     * @return Traversable<TKey, TValue>
+     * @return Traversable<array-key, TValue>
      */
     public function getIterator(): Traversable
     {
@@ -73,7 +72,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve all the cases as a plain array.
      *
-     * @return array<TKey, TValue>
+     * @return array<array-key, TValue>
      */
     public function all(): array
     {
@@ -83,7 +82,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve all the cases as a plain array recursively.
      *
-     * @return array<TKey, mixed>
+     * @return array<array-key, mixed>
      */
     public function toArray(): array
     {
@@ -99,7 +98,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve the first case.
      *
-     * @param (callable(TValue, TKey): bool)|null $callback
+     * @param (callable(TValue, array-key): bool)|null $callback
      * @return ?TValue
      */
     public function first(callable $callback = null): mixed
@@ -164,8 +163,8 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      *
      * @template TMapValue
      *
-     * @param callable(TValue, TKey): TMapValue $callback
-     * @return array<TKey, TMapValue>
+     * @param callable(TValue, array-key): TMapValue $callback
+     * @return array<array-key, TMapValue>
      */
     public function map(callable $callback): array
     {
