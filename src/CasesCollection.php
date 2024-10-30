@@ -5,17 +5,18 @@ namespace Cerbero\Enum;
 use BackedEnum;
 use Countable;
 use IteratorAggregate;
+use JsonSerializable;
+use Stringable;
 use Traversable;
 
 /**
  * The collection of enum cases.
  *
- * @template TKey of array-key
  * @template TValue
  *
- * @implements IteratorAggregate<TKey, TValue>
+ * @implements IteratorAggregate<array-key, TValue>
  */
-class CasesCollection implements Countable, IteratorAggregate
+class CasesCollection implements Countable, IteratorAggregate, JsonSerializable, Stringable
 {
     /**
      * Whether the cases belong to a backed enum.
@@ -25,11 +26,29 @@ class CasesCollection implements Countable, IteratorAggregate
     /**
      * Instantiate the class.
      *
-     * @param array<TKey, TValue> $cases
+     * @param array<array-key, TValue> $cases
      */
-    final public function __construct(protected array $cases)
+    final public function __construct(protected readonly array $cases)
     {
         $this->enumIsBacked = reset($cases) instanceof BackedEnum;
+    }
+
+    /**
+     * Turn the collection into a string.
+     */
+    public function __toString(): string
+    {
+        return (string) json_encode($this->jsonSerialize());
+    }
+
+    /**
+     * Turn the collection into a JSON serializable array.
+     *
+     * @return list<string|int>
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->enumIsBacked ? $this->values() : $this->names();
     }
 
     /**
@@ -43,7 +62,7 @@ class CasesCollection implements Countable, IteratorAggregate
     /**
      * Retrieve the iterable cases.
      *
-     * @return Traversable<TKey, TValue>
+     * @return Traversable<array-key, TValue>
      */
     public function getIterator(): Traversable
     {
@@ -53,7 +72,7 @@ class CasesCollection implements Countable, IteratorAggregate
     /**
      * Retrieve all the cases as a plain array.
      *
-     * @return array<TKey, TValue>
+     * @return array<array-key, TValue>
      */
     public function all(): array
     {
@@ -61,16 +80,30 @@ class CasesCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Determine whether the collection contains the given case.
+     */
+    public function has(mixed $case): bool
+    {
+        foreach ($this->cases as $instance) {
+            if ($instance->is($case)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Retrieve all the cases as a plain array recursively.
      *
-     * @return array<TKey, mixed>
+     * @return array<array-key, mixed>
      */
     public function toArray(): array
     {
         $array = [];
 
         foreach ($this->cases as $key => $value) {
-            $array[$key] = $value instanceof self ? $value->toArray() : $value;
+            $array[$key] = $value instanceof static ? $value->toArray() : $value;
         }
 
         return $array;
@@ -79,7 +112,7 @@ class CasesCollection implements Countable, IteratorAggregate
     /**
      * Retrieve the first case.
      *
-     * @param (callable(TValue, TKey): bool)|null $callback
+     * @param (callable(TValue, array-key): bool)|null $callback
      * @return ?TValue
      */
     public function first(callable $callback = null): mixed
@@ -144,8 +177,8 @@ class CasesCollection implements Countable, IteratorAggregate
      *
      * @template TMapValue
      *
-     * @param callable(TValue, TKey): TMapValue $callback
-     * @return array<TKey, TMapValue>
+     * @param callable(TValue, array-key): TMapValue $callback
+     * @return array<array-key, TMapValue>
      */
     public function map(callable $callback): array
     {

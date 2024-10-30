@@ -7,7 +7,7 @@ namespace Cerbero\Enum;
 use Closure;
 
 /**
- * The global behavior for all enums.
+ * The enums manager.
  */
 class Enums
 {
@@ -35,31 +35,31 @@ class Enums
     /**
      * Set the logic to run when an inaccessible enum method is called.
      *
-     * @param Closure(class-string $enum, string $name, array<array-key, mixed> $arguments): mixed $callback
+     * @param callable(class-string $enum, string $name, array<array-key, mixed> $arguments): mixed $callback
      */
-    public static function onStaticCall(Closure $callback): void
+    public static function onStaticCall(callable $callback): void
     {
-        static::$onStaticCall = $callback;
+        static::$onStaticCall = $callback(...);
     }
 
     /**
      * Set the logic to run when an inaccessible case method is called.
      *
-     * @param Closure(object $case, string $name, array<array-key, mixed> $arguments): mixed $callback
+     * @param callable(object $case, string $name, array<array-key, mixed> $arguments): mixed $callback
      */
-    public static function onCall(Closure $callback): void
+    public static function onCall(callable $callback): void
     {
-        static::$onCall = $callback;
+        static::$onCall = $callback(...);
     }
 
     /**
      * Set the logic to run when a case is invoked.
      *
-     * @param Closure(object $case, mixed ...$arguments): mixed $callback
+     * @param callable(object $case, mixed ...$arguments): mixed $callback
      */
-    public static function onInvoke(Closure $callback): void
+    public static function onInvoke(callable $callback): void
     {
-        static::$onInvoke = $callback;
+        static::$onInvoke = $callback(...);
     }
 
     /**
