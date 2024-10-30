@@ -32,6 +32,22 @@ trait SelfAware
     }
 
     /**
+     * Determine whether the enum is backed by integer.
+     */
+    public static function isBackedByInteger(): bool
+    {
+        return (new ReflectionEnum(self::class))->getBackingType()?->getName() === 'int';
+    }
+
+    /**
+     * Determine whether the enum is backed by string.
+     */
+    public static function isBackedByString(): bool
+    {
+        return (new ReflectionEnum(self::class))->getBackingType()?->getName() === 'string';
+    }
+
+    /**
      * Retrieve all the meta names of the enum.
      *
      * @return string[]
@@ -41,12 +57,12 @@ trait SelfAware
         $meta = [];
         $enum = new ReflectionEnum(self::class);
 
-        foreach ($enum->getAttributes(Meta::class) as $attribute) {
+        foreach ($enum->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             array_push($meta, ...$attribute->newInstance()->names());
         }
 
         foreach ($enum->getCases() as $case) {
-            foreach ($case->getAttributes(Meta::class) as $attribute) {
+            foreach ($case->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                 array_push($meta, ...$attribute->newInstance()->names());
             }
         }

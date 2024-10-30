@@ -26,13 +26,7 @@ trait Compares
      */
     public static function doesntHave(mixed $target): bool
     {
-        foreach (self::cases() as $case) {
-            if ($case->is($target)) {
-                return false;
-            }
-        }
-
-        return true;
+        return !self::has($target);
     }
 
     /**
@@ -74,12 +68,6 @@ trait Compares
      */
     public function notIn(iterable $targets): bool
     {
-        foreach ($targets as $target) {
-            if ($this->is($target)) {
-                return false;
-            }
-        }
-
-        return true;
+        return !$this->in($targets);
     }
 }
