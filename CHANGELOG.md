@@ -26,6 +26,32 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
+## 2.1.0 - 2024-10-30
+
+### Added
+- Method has() to the cases collection
+- JsonSerializable and Stringable interfaces to the cases collection
+- Methods isBackedByInteger() and isBackedByString() to the SelfAware trait
+
+### Changed
+- Allow any callable when setting the logic for magic methods
+- Allow meta inheritance when getting meta names
+- Improve generics in cases collection
+- Simplify logic by negating methods in the Compares trait
+
+### Deprecated
+- Nothing
+
+### Fixed
+- Nothing
+
+### Removed
+- Nothing
+
+### Security
+- Nothing
+
+
 ## 2.0.0 - 2024-10-05
 
 ### Added
