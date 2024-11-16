@@ -50,7 +50,7 @@ trait SelfAware
     /**
      * Retrieve all the meta names of the enum.
      *
-     * @return string[]
+     * @return list<string>
      */
     public static function metaNames(): array
     {
@@ -69,7 +69,7 @@ trait SelfAware
     /**
      * Retrieve all the meta attribute names of the enum.
      *
-     * @return string[]
+     * @return list<string>
      */
     public static function metaAttributeNames(): array
     {
