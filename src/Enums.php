@@ -72,7 +72,7 @@ class Enums
     {
         return static::$onStaticCall
             ? (static::$onStaticCall)($enum, $name, $arguments)
-            : $enum::fromName($name)->value();
+            : $enum::fromName($name)->value(); /** @phpstan-ignore method.nonObject */
     }
 
     /**
