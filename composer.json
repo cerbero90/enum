@@ -1,7 +1,7 @@
 {
     "name": "cerbero/enum",
     "type": "library",
-    "description": "PHP library to extend enum functionalities.",
+    "description": "Zero-dependencies package to supercharge enum functionalities.",
     "keywords": [
         "enum",
         "enumeration"
