@@ -11,7 +11,12 @@
 [![PER][ico-per]][link-per]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Zero-dependencies PHP library to supercharge enum functionalities.
+Zero-dependencies package to supercharge enum functionalities.
+
+> [!TIP]
+> Need to supercharge enums in a Laravel application?
+>
+> Consider using [🎲 Laravel Enum](https://github.com/cerbero90/laravel-enum) instead.
 
 
 ## 📦 Install
@@ -391,7 +396,10 @@ Finally, the following methods can be useful for inspecting enums or auto-genera
 ```php
 PureEnum::isPure(); // true
 PureEnum::isBacked(); // false
+PureEnum::isBackedByInteger(); // false
+PureEnum::isBackedByString(); // false
 PureEnum::metaNames(); // ['color', 'shape', 'isOdd']
+PureEnum::metaAttributeNames(); // ['color', 'shape']
 PureEnum::One->resolveItem('name'); // 'One'
 PureEnum::One->resolveMeta('isOdd'); // true
 PureEnum::One->resolveMetaAttribute('color'); // 'red'
@@ -399,7 +407,10 @@ PureEnum::One->value(); // 'One'
 
 BackedEnum::isPure(); // false
 BackedEnum::isBacked(); // true
+BackedEnum::isBackedByInteger(); // true
+BackedEnum::isBackedByString(); // false
 BackedEnum::metaNames(); // ['color', 'shape', 'isOdd']
+BackedEnum::metaAttributeNames(); // ['color', 'shape']
 BackedEnum::One->resolveItem('value'); // 1
 BackedEnum::One->resolveMeta('isOdd'); // true
 BackedEnum::One->resolveMetaAttribute('color'); // 'red'
