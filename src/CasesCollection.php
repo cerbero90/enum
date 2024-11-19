@@ -131,10 +131,11 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve all the names of the cases.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function names(): array
     {
+        /** @var list<string> */
         return array_column($this->cases, 'name');
     }
 
@@ -145,6 +146,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      */
     public function values(): array
     {
+        /** @var list<string|int> */
         return array_column($this->cases, 'value');
     }
 

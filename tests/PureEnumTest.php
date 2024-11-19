@@ -440,6 +440,10 @@ it('retrieves the meta names of an enum', function() {
     expect(PureEnum::metaNames())->toBe(['color', 'shape', 'isOdd']);
 });
 
+it('retrieves the meta attribute names of an enum', function() {
+    expect(PureEnum::metaAttributeNames())->toBe(['color', 'shape']);
+});
+
 it('retrieves the item of a case')
     ->expect(fn(string $item, mixed $value) => PureEnum::one->resolveItem($item) === $value)
     ->toBeTrue()

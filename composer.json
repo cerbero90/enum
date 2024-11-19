@@ -1,7 +1,7 @@
 {
     "name": "cerbero/enum",
     "type": "library",
-    "description": "PHP library to extend enum functionalities.",
+    "description": "Zero-dependencies package to supercharge enum functionalities.",
     "keywords": [
         "enum",
         "enumeration"
@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "pestphp/pest": "^2.0",
-        "phpstan/phpstan": "^1.9",
+        "phpstan/phpstan": "^2.0",
         "scrutinizer/ocular": "^1.9",
         "squizlabs/php_codesniffer": "^3.0",
         "tightenco/duster": "^2.0"

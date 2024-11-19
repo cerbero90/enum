@@ -50,9 +50,28 @@ trait SelfAware
     /**
      * Retrieve all the meta names of the enum.
      *
-     * @return string[]
+     * @return list<string>
      */
     public static function metaNames(): array
+    {
+        $meta = self::metaAttributeNames();
+        $enum = new ReflectionEnum(self::class);
+
+        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (! $method->isStatic() && $method->getFileName() == $enum->getFileName()) {
+                $meta[] = $method->getShortName();
+            }
+        }
+
+        return array_values(array_unique($meta));
+    }
+
+    /**
+     * Retrieve all the meta attribute names of the enum.
+     *
+     * @return list<string>
+     */
+    public static function metaAttributeNames(): array
     {
         $meta = [];
         $enum = new ReflectionEnum(self::class);
@@ -64,12 +83,6 @@ trait SelfAware
         foreach ($enum->getCases() as $case) {
             foreach ($case->getAttributes(Meta::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                 array_push($meta, ...$attribute->newInstance()->names());
-            }
-        }
-
-        foreach ($enum->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if (! $method->isStatic() && $method->getFileName() == $enum->getFileName()) {
-                $meta[] = $method->getShortName();
             }
         }
 

@@ -431,6 +431,10 @@ it('retrieves the meta names of an enum', function() {
     expect(BackedEnum::metaNames())->toBe(['color', 'shape', 'isOdd']);
 });
 
+it('retrieves the meta attribute names of an enum', function() {
+    expect(BackedEnum::metaAttributeNames())->toBe(['color', 'shape']);
+});
+
 it('retrieves a case item')
     ->expect(fn(string $item, mixed $value) => BackedEnum::one->resolveItem($item) === $value)
     ->toBeTrue()
