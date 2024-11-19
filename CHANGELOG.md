@@ -26,6 +26,15 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
+## 2.2.0 - 2024-11-19
+
+### Added
+- Method `SelfAware::metaAttributeNames()` to list the names of all meta attributes
+
+### Changed
+- Upgraded PHPStan to v2
+
+
 ## 2.1.0 - 2024-10-30
 
 ### Added
