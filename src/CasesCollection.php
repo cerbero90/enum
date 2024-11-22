@@ -112,10 +112,10 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve the first case.
      *
-     * @param (callable(TValue, array-key): bool)|null $callback
+     * @param ?callable(TValue, array-key): bool $callback
      * @return ?TValue
      */
-    public function first(callable|null $callback = null): mixed
+    public function first(?callable $callback = null): mixed
     {
         $callback ??= fn() => true;
 

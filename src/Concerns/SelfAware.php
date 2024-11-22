@@ -147,7 +147,7 @@ trait SelfAware
             }
         }
 
-        throw new ValueError(sprintf('"%s" is not a valid meta for enum "%s"', $meta, self::class));
+        throw new ValueError(sprintf('The case %s::%s has no "%s" meta set', self::class, $this->name, $meta));
     }
 
     /**

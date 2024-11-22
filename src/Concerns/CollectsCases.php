@@ -30,9 +30,9 @@ trait CollectsCases
     /**
      * Retrieve the first case.
      *
-     * @param (callable(self, array-key): bool)|null $callback
+     * @param ?callable(self, array-key): bool $callback
      */
-    public static function first(callable|null $callback = null): ?self
+    public static function first(?callable $callback = null): ?self
     {
         return self::collect()->first($callback);
     }
