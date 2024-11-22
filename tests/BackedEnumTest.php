@@ -394,7 +394,7 @@ it('runs custom logic when calling an inaccessible enum method', function() {
 });
 
 it('handles the call to an inaccessible case method', fn() => BackedEnum::one->unknownMethod())
-    ->throws(Error::class, '"unknownMethod" is not a valid meta for enum "Cerbero\Enum\BackedEnum"');
+    ->throws(Error::class, 'The case Cerbero\Enum\BackedEnum::one has no "unknownMethod" meta set');
 
 it('runs custom logic when calling an inaccessible case method', function() {
     Enums::onCall(function(object $case, string $name, array $arguments) {
@@ -450,7 +450,7 @@ it('retrieves the item of a case using a closure')
     ->toBe('red');
 
 it('throws a value error when attempting to retrieve an invalid item', fn() => BackedEnum::one->resolveItem('invalid'))
-    ->throws(ValueError::class, '"invalid" is not a valid meta for enum "Cerbero\Enum\BackedEnum"');
+    ->throws(ValueError::class, 'The case Cerbero\Enum\BackedEnum::one has no "invalid" meta set');
 
 it('retrieves the value of a backed case or the name of a pure case', function() {
     expect(BackedEnum::one->value())->toBe(1);

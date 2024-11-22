@@ -138,6 +138,12 @@ enum BackedEnum: int
 
 The above enum defines 3 meta for each case: `color`, `shape` and `isOdd`. The `#[Meta]` attributes are ideal to declare static information, whilst public non-static methods are ideal to declare dynamic information.
 
+To access a case meta, we can simply call the method having the same name of the wanted meta:
+
+```php
+BackedEnum::Two->color(); // green
+```
+
 `#[Meta]` attributes can also be attached to the enum itself to provide default values when a case does not declare its own meta values:
 
 ```php
