@@ -26,6 +26,15 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
+## 2.2.1 - 2024-11-22
+
+### Added
+- Full support for PHP 8.4
+
+### Changed
+- Improved error message for invalid meta
+
+
 ## 2.2.0 - 2024-11-19
 
 ### Added
