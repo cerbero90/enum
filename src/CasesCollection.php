@@ -115,7 +115,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      * @param (callable(TValue, array-key): bool)|null $callback
      * @return ?TValue
      */
-    public function first(callable $callback = null): mixed
+    public function first(callable|null $callback = null): mixed
     {
         $callback ??= fn() => true;
 
@@ -159,7 +159,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      * @param (callable(TValue): array-key)|string|null $key
      * @return array<array-key, TPluckValue>
      */
-    public function pluck(callable|string $value, callable|string $key = null): array
+    public function pluck(callable|string $value, callable|string|null $key = null): array
     {
         $result = [];
 
