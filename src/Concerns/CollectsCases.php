@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Cerbero\Enum\Concerns;
 
 use Cerbero\Enum\CasesCollection;
