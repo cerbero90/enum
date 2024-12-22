@@ -14,7 +14,7 @@ trait CollectsCases
     /**
      * Retrieve a collection with all the cases.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function collect(): CasesCollection
     {
@@ -89,7 +89,7 @@ trait CollectsCases
     /**
      * Retrieve all the cases keyed by their own name.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function keyByName(): CasesCollection
     {
@@ -100,7 +100,7 @@ trait CollectsCases
      * Retrieve all the cases keyed by the given key.
      *
      * @param (callable(self): array-key)|string $key
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function keyBy(callable|string $key): CasesCollection
     {
@@ -110,7 +110,7 @@ trait CollectsCases
     /**
      * Retrieve all the cases keyed by their own value.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function keyByValue(): CasesCollection
     {
@@ -121,9 +121,9 @@ trait CollectsCases
      * Retrieve all the cases grouped by the given key.
      *
      * @param (callable(self): array-key)|string $key
-     * @return CasesCollection<array-key, CasesCollection<array-key, self>>
+     * @return array<array-key, CasesCollection<self>>
      */
-    public static function groupBy(callable|string $key): CasesCollection
+    public static function groupBy(callable|string $key): array
     {
         return self::collect()->groupBy($key);
     }
@@ -132,7 +132,7 @@ trait CollectsCases
      * Retrieve only the filtered cases.
      *
      * @param (callable(self): bool)|string $filter
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function filter(callable|string $filter): CasesCollection
     {
@@ -142,7 +142,7 @@ trait CollectsCases
     /**
      * Retrieve only the cases having the given names.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function only(string ...$names): CasesCollection
     {
@@ -152,7 +152,7 @@ trait CollectsCases
     /**
      * Retrieve only the cases not having the given names.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function except(string ...$names): CasesCollection
     {
@@ -162,7 +162,7 @@ trait CollectsCases
     /**
      * Retrieve only the cases having the given values.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function onlyValues(string|int ...$values): CasesCollection
     {
@@ -172,7 +172,7 @@ trait CollectsCases
     /**
      * Retrieve only the cases not having the given values.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function exceptValues(string|int ...$values): CasesCollection
     {
@@ -182,7 +182,7 @@ trait CollectsCases
     /**
      * Retrieve all the cases sorted by their own name ascending.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function sort(): CasesCollection
     {
@@ -193,7 +193,7 @@ trait CollectsCases
      * Retrieve all the cases sorted by the given key ascending.
      *
      * @param (callable(self): mixed)|string $key
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function sortBy(callable|string $key): CasesCollection
     {
@@ -203,7 +203,7 @@ trait CollectsCases
     /**
      * Retrieve all the cases sorted by their own value ascending.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function sortByValue(): CasesCollection
     {
@@ -213,7 +213,7 @@ trait CollectsCases
     /**
      * Retrieve all the cases sorted by their own name descending.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function sortDesc(): CasesCollection
     {
@@ -224,7 +224,7 @@ trait CollectsCases
      * Retrieve all the cases sorted by the given key descending.
      *
      * @param (callable(self): mixed)|string $key
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function sortByDesc(callable|string $key): CasesCollection
     {
@@ -234,7 +234,7 @@ trait CollectsCases
     /**
      * Retrieve all the cases sorted by their own value descending.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      */
     public static function sortByDescValue(): CasesCollection
     {

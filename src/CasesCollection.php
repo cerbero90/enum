@@ -10,13 +10,14 @@ use IteratorAggregate;
 use JsonSerializable;
 use Stringable;
 use Traversable;
+use UnitEnum;
 
 /**
  * The collection of enum cases.
  *
- * @template TValue
+ * @template-covariant TEnum of UnitEnum
  *
- * @implements IteratorAggregate<array-key, TValue>
+ * @implements IteratorAggregate<array-key, TEnum>
  */
 class CasesCollection implements Countable, IteratorAggregate, JsonSerializable, Stringable
 {
@@ -28,7 +29,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Instantiate the class.
      *
-     * @param array<array-key, TValue> $cases
+     * @param array<array-key, TEnum> $cases
      */
     final public function __construct(protected readonly array $cases)
     {
@@ -64,7 +65,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve the iterable cases.
      *
-     * @return Traversable<array-key, TValue>
+     * @return Traversable<array-key, TEnum>
      */
     public function getIterator(): Traversable
     {
@@ -74,7 +75,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve all the cases as a plain array.
      *
-     * @return array<array-key, TValue>
+     * @return array<array-key, TEnum>
      */
     public function all(): array
     {
@@ -114,8 +115,8 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve the first case.
      *
-     * @param ?callable(TValue, array-key): bool $callback
-     * @return ?TValue
+     * @param ?callable(TEnum, array-key): bool $callback
+     * @return ?TEnum
      */
     public function first(?callable $callback = null): mixed
     {
@@ -157,8 +158,8 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      *
      * @template TPluckValue
      *
-     * @param (callable(TValue): TPluckValue)|string $value
-     * @param (callable(TValue): array-key)|string|null $key
+     * @param (callable(TEnum): TPluckValue)|string $value
+     * @param (callable(TEnum): array-key)|string|null $key
      * @return array<array-key, TPluckValue>
      */
     public function pluck(callable|string $value, callable|string|null $key = null): array
@@ -181,7 +182,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      *
      * @template TMapValue
      *
-     * @param callable(TValue, array-key): TMapValue $callback
+     * @param callable(TEnum, array-key): TMapValue $callback
      * @return array<array-key, TMapValue>
      */
     public function map(callable $callback): array
@@ -203,7 +204,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve the cases keyed by the given key.
      *
-     * @param (callable(TValue): array-key)|string $key
+     * @param (callable(TEnum): array-key)|string $key
      */
     public function keyBy(callable|string $key): static
     {
@@ -227,9 +228,10 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve the cases grouped by the given key.
      *
-     * @param (callable(TValue): array-key)|string $key
+     * @param (callable(TEnum): array-key)|string $key
+     * @return array<array-key, static<TEnum>>
      */
-    public function groupBy(callable|string $key): static
+    public function groupBy(callable|string $key): array
     {
         $grouped = [];
 
@@ -241,18 +243,18 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
             $grouped[$key] = new static($cases);
         }
 
-        return new static($grouped);
+        /** @var array<array-key, static<TEnum>> */
+        return $grouped;
     }
 
     /**
      * Retrieve a new collection with the filtered cases.
      *
-     * @param (callable(TValue): bool)|string $filter
+     * @param (callable(TEnum): bool)|string $filter
      */
     public function filter(callable|string $filter): static
     {
-        /** @phpstan-ignore method.nonObject */
-        $callback = is_callable($filter) ? $filter : fn(mixed $case) => $case->resolveItem($filter) === true;
+        $callback = is_callable($filter) ? $filter : fn(UnitEnum $case) => $case->resolveItem($filter) === true;
 
         return new static(array_filter($this->cases, $callback));
     }
@@ -262,7 +264,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      */
     public function only(string ...$name): static
     {
-        return $this->filter(fn(mixed $case) => in_array($case->name, $name));
+        return $this->filter(fn(UnitEnum $case) => in_array($case->name, $name));
     }
 
     /**
@@ -270,7 +272,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      */
     public function except(string ...$name): static
     {
-        return $this->filter(fn(mixed $case) => !in_array($case->name, $name));
+        return $this->filter(fn(UnitEnum $case) => !in_array($case->name, $name));
     }
 
     /**
@@ -278,7 +280,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      */
     public function onlyValues(string|int ...$value): static
     {
-        return $this->filter(fn(mixed $case) => $this->enumIsBacked && in_array($case->value, $value, true));
+        return $this->filter(fn(UnitEnum $case) => $this->enumIsBacked && in_array($case->value, $value, true));
     }
 
     /**
@@ -286,7 +288,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
      */
     public function exceptValues(string|int ...$value): static
     {
-        return $this->filter(fn(mixed $case) => $this->enumIsBacked && !in_array($case->value, $value, true));
+        return $this->filter(fn(UnitEnum $case) => $this->enumIsBacked && !in_array($case->value, $value, true));
     }
 
     /**
@@ -300,13 +302,13 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve a new collection of cases sorted by the given key ascending.
      *
-     * @param (callable(TValue): mixed)|string $key
+     * @param (callable(TEnum): mixed)|string $key
      */
     public function sortBy(callable|string $key): static
     {
         $cases = $this->cases;
 
-        uasort($cases, fn(mixed $a, mixed $b) => $a->resolveItem($key) <=> $b->resolveItem($key));
+        uasort($cases, fn(UnitEnum $a, UnitEnum $b) => $a->resolveItem($key) <=> $b->resolveItem($key));
 
         return new static($cases);
     }
@@ -330,13 +332,13 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
     /**
      * Retrieve a new collection of cases sorted by the given key descending.
      *
-     * @param (callable(TValue): mixed)|string $key
+     * @param (callable(TEnum): mixed)|string $key
      */
     public function sortByDesc(callable|string $key): static
     {
         $cases = $this->cases;
 
-        uasort($cases, fn(mixed $a, mixed $b) => $b->resolveItem($key) <=> $a->resolveItem($key));
+        uasort($cases, fn(UnitEnum $a, UnitEnum $b) => $b->resolveItem($key) <=> $a->resolveItem($key));
 
         return new static($cases);
     }

@@ -13,6 +13,8 @@ trait IsMagic
 {
     /**
      * Handle the call to an inaccessible enum method.
+     *
+     * @param array<array-key, mixed> $arguments
      */
     public static function __callStatic(string $name, array $arguments): mixed
     {
@@ -21,6 +23,8 @@ trait IsMagic
 
     /**
      * Handle the call to an inaccessible case method.
+     *
+     * @param array<array-key, mixed> $arguments
      */
     public function __call(string $name, array $arguments): mixed
     {

@@ -30,6 +30,7 @@ trait SelfAware
      */
     public static function isBacked(): bool
     {
+        /** @phpstan-ignore function.impossibleType */
         return is_subclass_of(self::class, BackedEnum::class);
     }
 
@@ -38,7 +39,7 @@ trait SelfAware
      */
     public static function isBackedByInteger(): bool
     {
-        return (new ReflectionEnum(self::class))->getBackingType()?->getName() === 'int';
+        return (string) (new ReflectionEnum(self::class))->getBackingType() === 'int';
     }
 
     /**
@@ -46,7 +47,7 @@ trait SelfAware
      */
     public static function isBackedByString(): bool
     {
-        return (new ReflectionEnum(self::class))->getBackingType()?->getName() === 'string';
+        return (string) (new ReflectionEnum(self::class))->getBackingType() === 'string';
     }
 
     /**
@@ -157,6 +158,7 @@ trait SelfAware
      */
     public function value(): string|int
     {
+        /** @var string|int @phpstan-ignore property.notFound */
         return $this->value ?? $this->name;
     }
 }
