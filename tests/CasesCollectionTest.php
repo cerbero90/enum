@@ -46,9 +46,12 @@ it('retrieves the count of all the cases')
     ->toBe(3);
 
 it('retrieves all the cases as a plain array recursively')
-    ->expect((new CasesCollection(PureEnum::cases()))->groupBy('isOdd'))
+    ->expect(new CasesCollection([PureEnum::collect(), BackedEnum::collect()]))
     ->toArray()
-    ->toBe([1 => [PureEnum::one, PureEnum::three], 0 => [PureEnum::two]]);
+    ->toBe([
+        [PureEnum::one, PureEnum::two, PureEnum::three],
+        [BackedEnum::one, BackedEnum::two, BackedEnum::three],
+    ]);
 
 it('retrieves the first case')
     ->expect(new CasesCollection(PureEnum::cases()))
@@ -106,7 +109,6 @@ it('retrieves an empty array when trying to key cases by value belonging to a pu
 it('retrieves the cases grouped by a custom key')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->groupBy('color')
-    ->toBeInstanceOf(CasesCollection::class)
     ->sequence(
         fn(Expectation $cases, Expectation $key) => $key->toBe('red')->and($cases)->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::one]),
         fn(Expectation $cases, Expectation $key) => $key->toBe('green')->and($cases)->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::two]),
@@ -116,7 +118,6 @@ it('retrieves the cases grouped by a custom key')
 it('retrieves the cases grouped by a custom closure')
     ->expect(new CasesCollection(PureEnum::cases()))
     ->groupBy(fn(PureEnum $case) => $case->isOdd())
-    ->toBeInstanceOf(CasesCollection::class)
     ->sequence(
         fn(Expectation $cases) => $cases->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::one, PureEnum::three]),
         fn(Expectation $cases) => $cases->toBeInstanceOf(CasesCollection::class)->all()->toBe([PureEnum::two]),

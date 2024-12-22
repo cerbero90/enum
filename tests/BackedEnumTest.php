@@ -85,7 +85,6 @@ it('retrieves all cases keyed by the result of a closure')
 
 it('retrieves all cases grouped by a custom key', function () {
     expect(BackedEnum::groupBy('color'))
-        ->toBeInstanceOf(CasesCollection::class)
         ->sequence(
             fn(Expectation $cases, Expectation $key) => $key->toBe('red')->and($cases)->toBeInstanceOf(CasesCollection::class)->all()->toBe([BackedEnum::one]),
             fn(Expectation $cases, Expectation $key) => $key->toBe('green')->and($cases)->toBeInstanceOf(CasesCollection::class)->all()->toBe([BackedEnum::two]),
@@ -95,7 +94,6 @@ it('retrieves all cases grouped by a custom key', function () {
 
 it('retrieves all cases grouped by the result of a closure', function () {
     expect(BackedEnum::groupBy(fn(BackedEnum $case) => $case->isOdd()))
-        ->toBeInstanceOf(CasesCollection::class)
         ->sequence(
             fn(Expectation $cases) => $cases->toBeInstanceOf(CasesCollection::class)->all()->toBe([BackedEnum::one, BackedEnum::three]),
             fn(Expectation $cases) => $cases->toBeInstanceOf(CasesCollection::class)->all()->toBe([BackedEnum::two]),
