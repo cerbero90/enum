@@ -531,7 +531,7 @@ If you discover any security related issues, please email andrea.marco.sartori@g
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
 [ico-author]: https://img.shields.io/badge/author-cerbero90-blue?logo=x&style=flat-square&logoSize=auto
-[ico-php]: https://img.shields.io/packagist/php-v/cerbero/enum?color=%2399c&logo=php&style=flat-square&logoSize=auto
+[ico-php]: https://img.shields.io/packagist/php-v/cerbero/enum?color=%23767bb5&logo=php&style=flat-square&logoSize=auto
 [ico-version]: https://img.shields.io/packagist/v/cerbero/enum.svg?label=version&style=flat-square
 [ico-actions]: https://img.shields.io/github/actions/workflow/status/cerbero90/enum/build.yml?branch=master&style=flat-square&logo=github&logoSize=auto
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
