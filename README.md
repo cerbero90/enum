@@ -37,8 +37,8 @@ composer require cerbero/enum
 * [🪄 Magic](#-magic)
 * [🤳 Self-awareness](#-self-awareness)
 * [🦾 Console commands](#-console-commands)
-* ├ [🗒️ annotate](#-annotate)
-* └ [🏗️ make](#-make)
+  * [🗒️ annotate](#-annotate)
+  * [🏗️ make](#-make)
 
 To supercharge our enums with all the features provided by this package, we can let our enums use the `Enumerates` trait:
 
