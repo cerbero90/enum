@@ -6,10 +6,10 @@
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![PHPStan Level][ico-phpstan]][link-phpstan]
+[![Total Downloads][ico-downloads]][link-downloads]
 [![Latest Version][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
 [![PER][ico-per]][link-per]
-[![Total Downloads][ico-downloads]][link-downloads]
 
 Zero-dependencies package to supercharge enum functionalities.
 
