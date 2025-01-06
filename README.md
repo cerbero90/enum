@@ -36,6 +36,9 @@ composer require cerbero/enum
 * [🧺 Cases collection](#-cases-collection)
 * [🪄 Magic](#-magic)
 * [🤳 Self-awareness](#-self-awareness)
+* [🦾 Console commands](#-console-commands)
+* ├ [🗒️ annotate](#-annotate)
+* └ [🏗️ make](#-make)
 
 To supercharge our enums with all the features provided by this package, we can let our enums use the `Enumerates` trait:
 
@@ -144,6 +147,9 @@ To access a case meta, we can simply call the method having the same name of the
 BackedEnum::Two->color(); // green
 ```
 
+> [!TIP]
+> Our IDE can autocomplete meta methods thanks to the [`annotate` command](#-annotate).
+
 `#[Meta]` attributes can also be attached to the enum itself to provide default values when a case does not declare its own meta values:
 
 ```php
@@ -229,7 +235,7 @@ PureEnum::map(fn(PureEnum $case, int $key) => $case->name . $key); // ['One0', '
 PureEnum::keyByName(); // CasesCollection['One' => PureEnum::One, 'Two' => PureEnum::Two, 'Three' => PureEnum::Three]
 PureEnum::keyBy('color'); // CasesCollection['red' => PureEnum::One, 'green' => PureEnum::Two, 'blue' => PureEnum::Three]
 PureEnum::keyByValue(); // CasesCollection[]
-PureEnum::groupBy('color'); // CasesCollection['red' => CasesCollection[PureEnum::One], 'green' => CasesCollection[PureEnum::Two], 'blue' => CasesCollection[PureEnum::Three]]
+PureEnum::groupBy('color'); // ['red' => CasesCollection[PureEnum::One], 'green' => CasesCollection[PureEnum::Two], 'blue' => CasesCollection[PureEnum::Three]]
 PureEnum::filter('isOdd'); // CasesCollection[PureEnum::One, PureEnum::Three]
 PureEnum::filter(fn(PureEnum $case) => $case->isOdd()); // CasesCollection[PureEnum::One, PureEnum::Three]
 PureEnum::only('Two', 'Three'); // CasesCollection[PureEnum::Two, PureEnum::Three]
@@ -258,7 +264,7 @@ BackedEnum::map(fn(BackedEnum $case, int $key) => $case->name . $key); // ['One0
 BackedEnum::keyByName(); // CasesCollection['One' => BackedEnum::One, 'Two' => BackedEnum::Two, 'Three' => BackedEnum::Three]
 BackedEnum::keyBy('color'); // CasesCollection['red' => BackedEnum::One, 'green' => BackedEnum::Two, 'blue' => BackedEnum::Three]
 BackedEnum::keyByValue(); // CasesCollection[1 => BackedEnum::One, 2 => BackedEnum::Two, 3 => BackedEnum::Three]
-BackedEnum::groupBy('color'); // CasesCollection['red' => CasesCollection[BackedEnum::One], 'green' => CasesCollection[BackedEnum::Two], 'blue' => CasesCollection[BackedEnum::Three]]
+BackedEnum::groupBy('color'); // ['red' => CasesCollection[BackedEnum::One], 'green' => CasesCollection[BackedEnum::Two], 'blue' => CasesCollection[BackedEnum::Three]]
 BackedEnum::filter('isOdd'); // CasesCollection[BackedEnum::One, BackedEnum::Three]
 BackedEnum::filter(fn(BackedEnum $case) => $case->isOdd()); // CasesCollection[BackedEnum::One, BackedEnum::Three]
 BackedEnum::only('Two', 'Three'); // CasesCollection[BackedEnum::Two, BackedEnum::Three]
@@ -311,25 +317,10 @@ PureEnum::One(); // 'One'
 BackedEnum::One(); // 1
 ```
 
-To improve the autocompletion of our IDE, we can add some method annotations to our enums:
+> [!TIP]
+> Our IDE can autocomplete cases static methods thanks to the [`annotate` command](#-annotate).
 
-```php
-/**
- * @method static int One()
- * @method static int Two()
- * @method static int Three()
- */
-enum BackedEnum: int
-{
-    use Enumerates;
-
-    case One = 1;
-    case Two = 2;
-    case Three = 3;
-}
-```
-
-By default, we can also obtain the name or value of a case by simply invoking it:
+We can also obtain the name or value of a case by simply invoking it:
 
 ```php
 $case = PureEnum::One;
@@ -347,31 +338,14 @@ PureEnum::One->color(); // 'red'
 BackedEnum::One->shape(); // 'triangle'
 ```
 
-To improve the autocompletion of our IDE, we can add some method annotations to our enums:
-
-```php
-/**
- * @method string color()
- */
-enum BackedEnum: int
-{
-    use Enumerates;
-
-    #[Meta(color: 'red')]
-    case One = 1;
-
-    #[Meta(color: 'green')]
-    case Two = 2;
-
-    #[Meta(color: 'blue')]
-    case Three = 3;
-}
-```
+> [!TIP]
+> Our IDE can autocomplete meta methods thanks to the [`annotate` command](#-annotate).
 
 Depending on our needs, we can customize the default behavior of all enums in our application when invoking a case or calling inaccessible methods:
 
 ```php
 use Cerbero\Enum\Enums;
+use UnitEnum;
 
 // define the logic to run when calling an inaccessible method of an enum
 Enums::onStaticCall(function(string $enum, string $name, array $arguments) {
@@ -381,14 +355,14 @@ Enums::onStaticCall(function(string $enum, string $name, array $arguments) {
 });
 
 // define the logic to run when calling an inaccessible method of a case
-Enums::onCall(function(object $case, string $name, array $arguments) {
+Enums::onCall(function(UnitEnum $case, string $name, array $arguments) {
     // $case is the instance of the case that called the inaccessible method
     // $name is the inaccessible method name
     // $arguments are the parameters passed to the inaccessible method
 });
 
 // define the logic to run when invoking a case
-Enums::onInvoke(function(object $case, mixed ...$arguments) {
+Enums::onInvoke(function(UnitEnum $case, mixed ...$arguments) {
     // $case is the instance of the case that is being invoked
     // $arguments are the parameters passed when invoking the case
 });
@@ -397,7 +371,7 @@ Enums::onInvoke(function(object $case, mixed ...$arguments) {
 
 ### 🤳 Self-awareness
 
-Finally, the following methods can be useful for inspecting enums or auto-generating code:
+Some internal methods are also available and can be useful for inspecting enums or auto-generating code:
 
 ```php
 PureEnum::isPure(); // true
@@ -421,6 +395,112 @@ BackedEnum::One->resolveItem('value'); // 1
 BackedEnum::One->resolveMeta('isOdd'); // true
 BackedEnum::One->resolveMetaAttribute('color'); // 'red'
 BackedEnum::One->value(); // 1
+```
+
+
+### 🦾 Console commands
+
+This package provides a handy binary, built to automate different tasks. To learn how to use it, we can simply run it:
+
+```bash
+./vendor/bin/enum
+```
+
+#### 🗒️ annotate
+
+The `annotate` command automatically adds method annotations to enums, making IDEs autocompletion possible:
+
+```bash
+./vendor/bin/enum annotate App/Enums/Enum
+
+./vendor/bin/enum annotate "App\Enums\Enum"
+```
+
+We can provide more than one enum to annotate, if needed:
+
+```bash
+./vendor/bin/enum annotate App/Enums/Enum1 App/Enums/Enum2
+
+./vendor/bin/enum annotate "App\Enums\Enum1" "App\Enums\Enum2"
+```
+
+Otherwise we can annotate all our enums at once by enabling the option `--all`:
+
+```bash
+./vendor/bin/enum annotate --all
+
+./vendor/bin/enum annotate -a
+```
+
+For the option `--all` to work, we need to set the paths where enums live in our application:
+
+```php
+use Cerbero\Enum\Enums;
+
+Enums::setPaths('app/Enums', 'domain/*/Enums');
+```
+
+In the above example, enums are discovered in the `app/Enums` directory and in all `Enums` sub-folders belonging to `domain`, e.g. `domain/Posts/Enums`, `domain/Users/Enums`, etc.
+
+This package tries to automatically find the application base path. However if enums can't be discovered after setting their paths, we can manually set our application base path:
+
+```php
+Enums::setBasePath(__DIR__ . '/path/to/our/app');
+```
+
+If we want to overwrite method annotations already annotated on enums, we can add the option `--force`:
+
+```bash
+php artisan enum:annotate App/Enums/Enum --force
+
+php artisan enum:annotate App/Enums/Enum -f
+```
+
+#### 🏗️ make
+
+The `make` command creates a new - automatically annotated - enum with the cases that we provide:
+
+```bash
+./vendor/bin/enum make App/Enums/Enum CaseOne CaseTwo
+
+./vendor/bin/enum make "App\Enums\Enum" CaseOne CaseTwo
+```
+
+If we need to create backed enums, we can specify a custom value for each case:
+
+```bash
+./vendor/bin/enum make App/Enums/Enum CaseOne=value1 CaseTwo=value2
+```
+
+Otherwise we can automatically assign values to cases by setting the `--backed` option:
+
+```bash
+./vendor/bin/enum make App/Enums/Enum CaseOne CaseTwo --backed=int0
+```
+
+The option `--backed` supports the following values:
+
+- `int0`: assign an incremental integer starting from 0 (0, 1, 2...)
+- `int1`: assign an incremental integer starting from 1 (1, 2, 3...)
+- `bitwise`: assign an incremental bitwise value (1, 2, 4...)
+- `snake`: assign the case name in snake case (case_one, case_two...)
+- `kebab`: assign the case name in kebab case (case-one, case-two...)
+- `camel`: assign the case name in camel case (caseOne, caseTwo...)
+- `lower`: assign the case name in lower case (caseone, casetwo...)
+- `upper`: assign the case name in upper case (CASEONE, CASETWO...)
+
+If we want to overwrite an existing enum, we can add the option `--force`:
+
+```bash
+php artisan enum:make App/Enums/Enum CaseOne CaseTwo --force
+
+php artisan enum:make App/Enums/Enum CaseOne CaseTwo -f
+```
+
+This package tries to automatically find the application base path. However if enums can't be successfully created, we can manually set our application base path:
+
+```php
+Enums::setBasePath(__DIR__ . '/path/to/our/app');
 ```
 
 ## 📆 Change log
@@ -450,18 +530,18 @@ If you discover any security related issues, please email andrea.marco.sartori@g
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-[ico-author]: https://img.shields.io/static/v1?label=author&message=cerbero90&color=50ABF1&logo=twitter&style=flat-square
-[ico-php]: https://img.shields.io/packagist/php-v/cerbero/enum?color=%234F5B93&logo=php&style=flat-square
+[ico-author]: https://img.shields.io/badge/author-cerbero90-blue?logo=x&style=flat-square&logoSize=auto
+[ico-php]: https://img.shields.io/packagist/php-v/cerbero/enum?color=%234F5B93&logo=php&style=flat-square&logoSize=auto
 [ico-version]: https://img.shields.io/packagist/v/cerbero/enum.svg?label=version&style=flat-square
-[ico-actions]: https://img.shields.io/github/actions/workflow/status/cerbero90/enum/build.yml?branch=master&style=flat-square&logo=github
+[ico-actions]: https://img.shields.io/github/actions/workflow/status/cerbero90/enum/build.yml?branch=master&style=flat-square&logo=github&logoSize=auto
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
 [ico-per]: https://img.shields.io/static/v1?label=compliance&message=PER&color=blue&style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/cerbero90/enum.svg?style=flat-square&logo=scrutinizer
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/cerbero90/enum.svg?style=flat-square&logo=scrutinizer
-[ico-phpstan]: https://img.shields.io/badge/level-max-success?style=flat-square&logo=data:image/png;base64,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
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/cerbero90/enum.svg?style=flat-square&logo=scrutinizer&logoSize=auto
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/cerbero90/enum.svg?style=flat-square&logo=scrutinizer&logoSize=auto
+[ico-phpstan]: https://img.shields.io/badge/level-max-success?style=flat-square&logo=data:image/png;base64,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&logoSize=auto
 [ico-downloads]: https://img.shields.io/packagist/dt/cerbero/enum.svg?style=flat-square
 
-[link-author]: https://twitter.com/cerbero90
+[link-author]: https://x.com/cerbero90
 [link-php]: https://www.php.net
 [link-packagist]: https://packagist.org/packages/cerbero/enum
 [link-actions]: https://github.com/cerbero90/enum/actions?query=workflow%3Abuild
