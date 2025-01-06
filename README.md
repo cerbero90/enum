@@ -534,7 +534,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-php]: https://img.shields.io/packagist/php-v/cerbero/enum?color=%23767bb5&logo=php&style=flat-square&logoSize=auto
 [ico-version]: https://img.shields.io/packagist/v/cerbero/enum.svg?label=version&style=flat-square
 [ico-actions]: https://img.shields.io/github/actions/workflow/status/cerbero90/enum/build.yml?branch=master&style=flat-square&logo=github&logoSize=auto
-[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
 [ico-per]: https://img.shields.io/static/v1?label=compliance&message=PER&color=blue&style=flat-square
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/cerbero90/enum.svg?style=flat-square&logo=scrutinizer&logoSize=auto
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/cerbero90/enum.svg?style=flat-square&logo=scrutinizer&logoSize=auto
