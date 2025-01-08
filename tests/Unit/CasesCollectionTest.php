@@ -1,8 +1,8 @@
 <?php
 
-use Cerbero\Enum\BackedEnum;
+use Cerbero\Enum\Enums\BackedEnum;
 use Cerbero\Enum\CasesCollection;
-use Cerbero\Enum\PureEnum;
+use Cerbero\Enum\Enums\PureEnum;
 use Pest\Expectation;
 
 it('turns into a JSON with pure cases', function() {

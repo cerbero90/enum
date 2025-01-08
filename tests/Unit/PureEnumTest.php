@@ -2,8 +2,8 @@
 
 use Cerbero\Enum\CasesCollection;
 use Cerbero\Enum\Enums;
-use Cerbero\Enum\InvalidMetaAttribute;
-use Cerbero\Enum\PureEnum;
+use Cerbero\Enum\Enums\InvalidMetaAttribute;
+use Cerbero\Enum\Enums\PureEnum;
 use Pest\Expectation;
 
 it('determines whether the enum is pure')
@@ -309,7 +309,7 @@ it('retrieves the case hydrated from a value')
     ]);
 
 it('throws a value error when hydrating cases with an invalid value', fn() => PureEnum::from('1'))
-    ->throws(ValueError::class, '"1" is not a valid name for enum "Cerbero\Enum\PureEnum"');
+    ->throws(ValueError::class, '"1" is not a valid name for enum "Cerbero\Enum\Enums\PureEnum"');
 
 it('retrieves the case hydrated from a value or returns null')
     ->expect(fn(string $value, ?PureEnum $case) => PureEnum::tryFrom($value) === $case)
@@ -332,7 +332,7 @@ it('retrieves the case hydrated from a name')
     ]);
 
 it('throws a value error when hydrating cases with an invalid name', fn() => PureEnum::fromName('1'))
-    ->throws(ValueError::class, '"1" is not a valid name for enum "Cerbero\Enum\PureEnum"');
+    ->throws(ValueError::class, '"1" is not a valid name for enum "Cerbero\Enum\Enums\PureEnum"');
 
 it('retrieves the case hydrated from a name or returns null')
     ->expect(fn(string $name, ?PureEnum $case) => PureEnum::tryFromName($name) === $case)
@@ -361,7 +361,7 @@ it('retrieves the cases hydrated from a meta using a closure')
     ->toBe([PureEnum::two]);
 
 it('throws a value error when hydrating cases with an invalid meta', fn() => PureEnum::fromMeta('color', 'orange'))
-    ->throws(ValueError::class, 'Invalid value for the meta "color" for enum "Cerbero\Enum\PureEnum"');
+    ->throws(ValueError::class, 'Invalid value for the meta "color" for enum "Cerbero\Enum\Enums\PureEnum"');
 
 it('retrieves the case hydrated from a meta or returns null')
     ->expect(fn(string $meta, mixed $value, ?array $cases) => PureEnum::tryFromMeta($meta, $value)?->all() === $cases)
@@ -384,7 +384,7 @@ it('handles the call to an inaccessible enum method')
     ->toBe('one');
 
 it('fails handling the call to an invalid enum method', fn() => PureEnum::four())
-    ->throws(ValueError::class, '"four" is not a valid name for enum "Cerbero\Enum\PureEnum"');
+    ->throws(ValueError::class, '"four" is not a valid name for enum "Cerbero\Enum\Enums\PureEnum"');
 
 it('runs custom logic when calling an inaccessible enum method', function() {
     Enums::onStaticCall(function(string $enum, string $name, array $arguments) {
@@ -401,7 +401,7 @@ it('runs custom logic when calling an inaccessible enum method', function() {
 });
 
 it('handles the call to an inaccessible case method', fn() => PureEnum::one->unknownMethod())
-    ->throws(Error::class, 'The case Cerbero\Enum\PureEnum::one has no "unknownMethod" meta set');
+    ->throws(Error::class, 'The case Cerbero\Enum\Enums\PureEnum::one has no "unknownMethod" meta set');
 
 it('runs custom logic when calling an inaccessible case method', function() {
     Enums::onCall(function(object $case, string $name, array $arguments) {
@@ -456,7 +456,7 @@ it('retrieves the item of a case using a closure')
     ->toBe('red');
 
 it('throws a value error when attempting to retrieve an invalid item', fn() => PureEnum::one->resolveItem('invalid'))
-    ->throws(ValueError::class, 'The case Cerbero\Enum\PureEnum::one has no "invalid" meta set');
+    ->throws(ValueError::class, 'The case Cerbero\Enum\Enums\PureEnum::one has no "invalid" meta set');
 
 it('retrieves the value of a backed case or the name of a pure case', function() {
     expect(PureEnum::one->value())->toBe('one');
