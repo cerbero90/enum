@@ -118,7 +118,7 @@ function runAnnotate(string $enum, bool $force = false): bool
     // Since we are writing on the disk, the enum in memory might get out of sync.
     // To ensure that the annotations reflect the current content of such enum,
     // we spin a new process to load in memory the latest state of the enum.
-    $command = __DIR__ . "/../bin/enum annotate \"{$enum}\"" . ($force ? ' --force' : '');
+    $command = path(__DIR__ . '/../bin/enum') . " annotate \"{$enum}\"" . ($force ? ' --force' : '');
 
     ob_start();
 

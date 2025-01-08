@@ -24,6 +24,8 @@
 |
 */
 
+use function Cerbero\Enum\path;
+
 expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) {
     $oldContents = [];
 
@@ -50,8 +52,8 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
             }
 
             // normalize content to avoid end-of-line incompatibility between OS
-            $enumContent = str_replace(["\r\n", "\n"], ["\n", "\r\n"], file_get_contents($filename));
-            $stubContent = str_replace(["\r\n", "\n"], ["\n", "\r\n"], file_get_contents($stub));
+            $enumContent = str_replace("\r\n", "\n", file_get_contents($filename));
+            $stubContent = str_replace("\r\n", "\n", file_get_contents($stub));
 
             expect($enumContent)->toBe($stubContent);
         }
@@ -82,7 +84,7 @@ function runEnum(string $command): stdClass
 {
     ob_start();
 
-    passthru(__DIR__ . "/../bin/enum {$command} 2>&1", $status);
+    passthru(path(__DIR__ . '/../bin/enum') . " {$command} 2>&1", $status);
 
     $output = ob_get_clean();
 
