@@ -49,9 +49,16 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
                 $stub = $path;
             }
 
-            expect(file_get_contents($filename))->toBe(file_get_contents($stub));
+            // reading in binary mode to avoid end-of-line incompatibility between OS
+            $enumHandle = fopen($filename, 'rb');
+            $stubHandle = fopen($stub, 'rb');
+
+            expect(stream_get_contents($enumHandle))->toBe(stream_get_contents($stubHandle));
         }
     } finally {
+        is_resource($enumHandle) && fclose($enumHandle);
+        is_resource($stubHandle) && fclose($stubHandle);
+
         foreach ($oldContents as $filename => $oldContent) {
             file_put_contents($filename, $oldContent);
         }
