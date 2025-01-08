@@ -49,16 +49,13 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
                 $stub = $path;
             }
 
-            // reading in binary mode to avoid end-of-line incompatibility between OS
-            $enumHandle = fopen($filename, 'rb');
-            $stubHandle = fopen($stub, 'rb');
+            // normalize content to avoid end-of-line incompatibility between OS
+            $enumContent = str_replace(["\r\n", "\n"], ["\n", "\r\n"], file_get_contents($filename));
+            $stubContent = str_replace(["\r\n", "\n"], ["\n", "\r\n"], file_get_contents($stub));
 
-            expect(stream_get_contents($enumHandle))->toBe(stream_get_contents($stubHandle));
+            expect($enumContent)->toBe($stubContent);
         }
     } finally {
-        is_resource($enumHandle) && fclose($enumHandle);
-        is_resource($stubHandle) && fclose($stubHandle);
-
         foreach ($oldContents as $filename => $oldContent) {
             file_put_contents($filename, $oldContent);
         }
