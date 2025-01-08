@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use Cerbero\Enum\Concerns\Enumerates;
+
+enum {{ name }}{{ backingType }}
+{
+    use Enumerates;
+
+{{ cases }}
+}

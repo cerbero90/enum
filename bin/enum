@@ -1,0 +1,131 @@
+#!/usr/bin/env php
+
+<?php
+
+use Cerbero\Enum\Data\GeneratingEnum;
+use Cerbero\Enum\Enums;
+use Cerbero\Enum\Enums\Backed;
+use Cerbero\Enum\Services\Annotator;
+use Cerbero\Enum\Services\Generator;
+
+use function Cerbero\Enum\backCases;
+use function Cerbero\Enum\enumOutcome;
+use function Cerbero\Enum\fail;
+use function Cerbero\Enum\normalizeEnums;
+use function Cerbero\Enum\option;
+use function Cerbero\Enum\runAnnotate;
+use function Cerbero\Enum\splitArgv;
+use function Cerbero\Enum\succeed;
+
+is_file($autoload = dirname(__DIR__, 1) . '/vendor/autoload.php') && require $autoload;
+is_file($autoload = dirname(__DIR__, 4) . '/vendor/autoload.php') && require $autoload;
+
+$allowedCommands = ['annotate', 'make'];
+[$arguments, $options] = splitArgv($argv);
+
+if (in_array($command = $argv[1] ?? null, $allowedCommands)) {
+    try {
+        $outcome = $command($arguments, $options);
+    } catch (Throwable $e) {
+        $outcome = fail($e->getMessage());
+    }
+
+    exit($outcome ? 0 : 1);
+}
+
+/**
+ * Annotate enums to ease IDE autocompletion.
+ *
+ * @param string[] $arguments
+ * @param string[] $options
+ */
+function annotate(array $arguments, array $options): bool
+{
+    $enums = array_intersect(['--all', '-a'], $options) ? [...Enums::namespaces()] : normalizeEnums($arguments);
+
+    if (empty($enums)) {
+        return succeed('No enums to annotate.');
+    }
+
+    $succeeded = true;
+    $force = !! array_intersect(['--force', '-f'], $options);
+
+    foreach ($enums as $enum) {
+        $succeeded = enumOutcome($enum, fn() => (new Annotator($enum))->annotate($force)) && $succeeded;
+    }
+
+    return $succeeded;
+}
+
+/**
+ * Create a new enum.
+ *
+ * @param string[] $arguments
+ * @param string[] $options
+ */
+function make(array $arguments, array $options): bool
+{
+    if (! $namespace = strtr($arguments[0] ?? '', '/', '\\')) {
+        return fail('The name of the enum is missing.');
+    }
+
+    $force = !! array_intersect(['--force', '-f'], $options);
+
+    if (enum_exists($namespace) && ! $force) {
+        return succeed("The enum {$namespace} already exists.");
+    }
+
+    if (! $cases = array_slice($arguments, 1)) {
+        return fail('The cases of the enum are missing.');
+    }
+
+    try {
+        $backedCases = backCases($cases, option('backed', $options));
+    } catch (ValueError) {
+        return fail('The option --backed supports only ' . implode(', ', Backed::names()));
+    }
+
+    $enum = new GeneratingEnum($namespace, $backedCases);
+
+    return enumOutcome($namespace, function() use ($enum, $force) {
+        return (new Generator($enum))->generate($force) && runAnnotate($enum->fullNamespace, $force);
+    });
+}
+
+?>
+Annotate enums to ease IDE autocompletion.
+
+Usage: enum annotate enum1 [enum2 ...]
+
+Available options:
+
+    -a, --all               Whether all enums should be annotated
+    -f, --force             Whether existing annotations should be overwritten
+
+Examples:
+    enum annotate App/Enums/MyEnum
+    enum annotate "App\Enums\MyEnum"
+    enum annotate App/Enums/MyEnum1 App/Enums/MyEnum2
+    enum annotate App/Enums/MyEnum --force
+    enum annotate --all
+    enum annotate --all --force
+
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+Create a new enum.
+
+Usage: enum make enum case1 case2
+
+Available options:
+
+    --backed=VALUE          How cases should be backed. VALUE is either:
+                            snake|camel|kebab|upper|lower|int0|int1|bitwise
+    -f, --force             Whether the existing enum should be overwritten
+
+Examples:
+    enum make App/Enums/MyEnum Case1 Case2
+    enum make "App\Enums\MyEnum" Case1 Case2
+    enum make App/Enums/MyEnum Case1=value1 Case2=value2
+    enum make App/Enums/MyEnum Case1 Case2 --backed=int1
+    enum make App/Enums/MyEnum Case1 Case2 --force
+    enum make App/Enums/MyEnum Case1 Case2 --backed=bitwise --force

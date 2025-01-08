@@ -27,13 +27,20 @@
     "autoload": {
         "psr-4": {
             "Cerbero\\Enum\\": "src"
-        }
+        },
+        "files": [
+            "helpers/core.php",
+            "helpers/cli.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Cerbero\\Enum\\": "tests"
+            "Cerbero\\Enum\\": "tests",
+            "App\\": "tests/Skeleton/app",
+            "Domain\\": "tests/Skeleton/domain"
         }
     },
+    "bin": ["bin/enum"],
     "scripts": {
         "fix": "duster fix -u tlint,phpcodesniffer,pint",
         "lint": "duster lint -u tlint,phpcodesniffer,pint,phpstan",
