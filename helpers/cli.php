@@ -118,13 +118,19 @@ function runAnnotate(string $enum, bool $force = false): bool
     // Since we are writing on the disk, the enum in memory might get out of sync.
     // To ensure that the annotations reflect the current content of such enum,
     // we spin a new process to load in memory the latest state of the enum.
-    $command = path(__DIR__ . '/../bin/enum') . " annotate \"{$enum}\"" . ($force ? ' --force' : '');
-
     ob_start();
 
-    $succeeded = passthru('"' . PHP_BINARY . '" ' . $command . ' 2>&1') === null;
+    $succeeded = cli("annotate \"{$enum}\"" . ($force ? ' --force' : ''));
 
     ob_end_clean();
 
     return $succeeded;
+}
+
+/**
+ * Run the enum CLI in a new process.
+ */
+function cli(string $command, ?int &$status = null): bool
+{
+    return passthru('"' . PHP_BINARY . '" ' . path(__DIR__ . '/../bin/enum') . " {$command} 2>&1", $status) === null;
 }

@@ -24,7 +24,7 @@
 |
 */
 
-use function Cerbero\Enum\path;
+use function Cerbero\Enum\cli;
 
 expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) {
     $oldContents = [];
@@ -84,7 +84,7 @@ function runEnum(string $command): stdClass
 {
     ob_start();
 
-    passthru('"' . PHP_BINARY . '" ' . path(__DIR__ . '/../bin/enum') . " {$command} 2>&1", $status);
+    cli($command, $status);
 
     $output = ob_get_clean();
 
