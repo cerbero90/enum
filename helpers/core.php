@@ -186,7 +186,7 @@ function namespaceToPath(string $namespace): string
 
     foreach (psr4() as $root => $relative) {
         if (str_starts_with($namespace, $root)) {
-            $relative = path($relative, trail: true);
+            $relative = path($relative) . DIRECTORY_SEPARATOR;
 
             return strtr($path, [$root => $relative]);
         }
@@ -198,7 +198,7 @@ function namespaceToPath(string $namespace): string
 /**
  * Retrieve the normalized path.
  */
-function path(string $path, bool $trail = false): string
+function path(string $path): string
 {
     $segments = [];
     $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
@@ -213,7 +213,5 @@ function path(string $path, bool $trail = false): string
         }
     }
 
-    $path = $head . implode(DIRECTORY_SEPARATOR, $segments);
-
-    return $trail ? $path . DIRECTORY_SEPARATOR : $path;
+    return $head . implode(DIRECTORY_SEPARATOR, $segments);
 }
