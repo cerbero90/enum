@@ -13,7 +13,7 @@ use Cerbero\Enum\Concerns\Enumerates;
  * @method static string One()
  * @method static string Three()
  * @method static string Two()
- * @method static list<string> names()
+ * @method static int count()
  * @method ?string alias()
  * @method float float()
  * @method bool isEven()

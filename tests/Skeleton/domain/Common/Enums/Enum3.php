@@ -10,7 +10,7 @@ use Cerbero\Enum\Concerns\Enumerates;
 /**
  * The enum 3.
  *
- * @method static list<string> names()
+ * @method static int count()
  */
 #[Meta(next: null, isEven: false, alias: null)]
 enum Enum3: string
