@@ -122,7 +122,7 @@ function runAnnotate(string $enum, bool $force = false): bool
 
     ob_start();
 
-    $succeeded = passthru($command . ' 2>&1') === null;
+    $succeeded = passthru('"' . PHP_BINARY . '" ' . $command . ' 2>&1') === null;
 
     ob_end_clean();
 

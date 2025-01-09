@@ -84,7 +84,7 @@ function runEnum(string $command): stdClass
 {
     ob_start();
 
-    passthru(path(__DIR__ . '/../bin/enum') . " {$command} 2>&1", $status);
+    passthru('"' . PHP_BINARY . '" ' . path(__DIR__ . '/../bin/enum') . " {$command} 2>&1", $status);
 
     $output = ob_get_clean();
 
