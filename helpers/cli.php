@@ -134,11 +134,11 @@ function runAnnotate(string $enum, bool $force = false): bool
     // Since we are writing on the disk, the enum in memory might get out of sync.
     // To ensure that the annotations reflect the current content of such enum,
     // we spin a new process to load in memory the latest state of the enum.
-    ob_start();
+    // ob_start();
 
     $succeeded = cli("annotate \"{$enum}\"" . ($force ? ' --force' : ''));
 
-    ob_end_clean();
+    // ob_end_clean();
 
     return $succeeded;
 }
