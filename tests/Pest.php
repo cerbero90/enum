@@ -69,9 +69,13 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
 expect()->extend('toGenerate', function (string $enum) {
     expect(class_exists($enum))->toBeFalse();
 
+    $directory = 'make';
+
     try {
         if (is_bool($value = ($this->value)())) {
             expect($value)->toBeTrue();
+
+            $directory = 'generator';
         } else {
             expect($value)
                 ->output->toContain($enum)
@@ -79,7 +83,7 @@ expect()->extend('toGenerate', function (string $enum) {
         }
 
         $filename = namespaceToPath($enum);
-        $stub = sprintf('%s/stubs/%s/%s.stub', __DIR__, is_bool($value) ? 'generator' : 'make', className($enum));
+        $stub = sprintf('%s/stubs/%s/%s.stub', __DIR__, $directory, className($enum));
 
         // normalize content to avoid end-of-line incompatibility between OS
         $enumContent = str_replace("\r\n", "\n", file_get_contents($filename));
