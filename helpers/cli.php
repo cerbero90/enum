@@ -156,6 +156,6 @@ function cli(string $command, ?int &$status = null): bool
         Enums::basePath(),
         implode(',', Enums::paths()),
     ]);
-
+var_dump($cmd);
     return passthru($cmd, $status) === null;
 }
