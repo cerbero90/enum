@@ -24,7 +24,9 @@
 |
 */
 
+use function Cerbero\Enum\className;
 use function Cerbero\Enum\cli;
+use function Cerbero\Enum\namespaceToPath;
 
 expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) {
     $oldContents = [];
@@ -45,7 +47,7 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
         }
 
         foreach ($oldContents as $filename => $oldContent) {
-            $stub = __DIR__ . '/stubs/' . basename($filename, '.php') . '.stub';
+            $stub = __DIR__ . '/stubs/annotate/' . basename($filename, '.php') . '.stub';
 
             if ($overwrite && file_exists($path = __DIR__ . '/stubs/' . basename($filename, '.php') . '.force.stub')) {
                 $stub = $path;
@@ -61,6 +63,31 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
         foreach ($oldContents as $filename => $oldContent) {
             file_put_contents($filename, $oldContent);
         }
+    }
+});
+
+expect()->extend('toGenerate', function (string $enum) {
+    expect(class_exists($enum))->toBeFalse();
+
+    try {
+        if (is_bool($value = ($this->value)())) {
+            expect($value)->toBeTrue();
+        } else {
+            expect($value)
+                ->output->toContain($enum)
+                ->status->toBe(0);
+        }
+
+        $filename = namespaceToPath($enum);
+        $stub = sprintf('%s/stubs/%s/%s.stub', __DIR__, is_bool($value) ? 'generator' : 'make', className($enum));
+
+        // normalize content to avoid end-of-line incompatibility between OS
+        $enumContent = str_replace("\r\n", "\n", file_get_contents($filename));
+        $stubContent = str_replace("\r\n", "\n", file_get_contents($stub));
+
+        expect($enumContent)->toBe($stubContent);
+    } finally {
+        file_exists($filename) && unlink($filename);
     }
 });
 
