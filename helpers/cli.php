@@ -49,6 +49,22 @@ function splitArgv(array $argv): array
 }
 
 /**
+ * Set enum paths from the given options.
+ *
+ * @param string[] $options
+ */
+function setPathsByOptions(array $options): void
+{
+    if ($basePath = option('base-path', $options)) {
+        Enums::setBasePath($basePath);
+    }
+
+    if ($paths = option('paths', $options)) {
+        Enums::setPaths(...explode(',', $paths));
+    }
+}
+
+/**
  * Retrieve the value of the given option.
  *
  * @param string[] $options
@@ -132,5 +148,13 @@ function runAnnotate(string $enum, bool $force = false): bool
  */
 function cli(string $command, ?int &$status = null): bool
 {
-    return passthru('"' . PHP_BINARY . '" ' . path(__DIR__ . '/../bin/enum') . " {$command} 2>&1", $status) === null;
+    $cmd = vsprintf('"%s" "%s" %s --base-path="%s" --paths="%s" 2>&1', [
+        PHP_BINARY,
+        path(__DIR__ . '/../bin/enum'),
+        $command,
+        Enums::basePath(),
+        implode(',', Enums::paths()),
+    ]);
+
+    return passthru($cmd, $status) === null;
 }

@@ -2,18 +2,17 @@
 
 <?php
 
-use Cerbero\Enum\Data\GeneratingEnum;
 use Cerbero\Enum\Enums;
 use Cerbero\Enum\Enums\Backed;
 use Cerbero\Enum\Services\Annotator;
 use Cerbero\Enum\Services\Generator;
 
-use function Cerbero\Enum\backCases;
 use function Cerbero\Enum\enumOutcome;
 use function Cerbero\Enum\fail;
 use function Cerbero\Enum\normalizeEnums;
 use function Cerbero\Enum\option;
 use function Cerbero\Enum\runAnnotate;
+use function Cerbero\Enum\setPathsByOptions;
 use function Cerbero\Enum\splitArgv;
 use function Cerbero\Enum\succeed;
 
@@ -25,6 +24,8 @@ $allowedCommands = ['annotate', 'make'];
 
 if (in_array($command = $argv[1] ?? null, $allowedCommands)) {
     try {
+        setPathsByOptions($options);
+
         $outcome = $command($arguments, $options);
     } catch (Throwable $e) {
         $outcome = fail($e->getMessage());
@@ -65,14 +66,14 @@ function annotate(array $arguments, array $options): bool
  */
 function make(array $arguments, array $options): bool
 {
-    if (! $namespace = strtr($arguments[0] ?? '', '/', '\\')) {
+    if (! $enum = strtr($arguments[0] ?? '', '/', '\\')) {
         return fail('The name of the enum is missing.');
     }
 
     $force = !! array_intersect(['--force', '-f'], $options);
 
-    if (enum_exists($namespace) && ! $force) {
-        return succeed("The enum {$namespace} already exists.");
+    if (enum_exists($enum) && ! $force) {
+        return succeed("The enum {$enum} already exists.");
     }
 
     if (! $cases = array_slice($arguments, 1)) {
@@ -80,16 +81,12 @@ function make(array $arguments, array $options): bool
     }
 
     try {
-        $backedCases = backCases($cases, option('backed', $options));
+        $generator = new Generator($enum, $cases, option('backed', $options));
     } catch (ValueError) {
         return fail('The option --backed supports only ' . implode(', ', Backed::names()));
     }
 
-    $enum = new GeneratingEnum($namespace, $backedCases);
-
-    return enumOutcome($namespace, function() use ($enum, $force) {
-        return (new Generator($enum))->generate($force) && runAnnotate($enum->fullNamespace, $force);
-    });
+    return enumOutcome($enum, fn() => $generator->generate($force) && runAnnotate($enum, $force));
 }
 
 ?>

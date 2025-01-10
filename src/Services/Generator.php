@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cerbero\Enum\Services;
 
 use Cerbero\Enum\Data\GeneratingEnum;
+use Cerbero\Enum\Enums\Backed;
 
 /**
  * The enums generator.
@@ -12,9 +13,20 @@ use Cerbero\Enum\Data\GeneratingEnum;
 class Generator
 {
     /**
-     * Instantiate the class.
+     * The enum being generated.
      */
-    public function __construct(protected readonly GeneratingEnum $enum) {}
+    protected readonly GeneratingEnum $enum;
+
+    /**
+     * Instantiate the class.
+     *
+     * @param string[] $cases
+     * @throws \ValueError
+     */
+    public function __construct(string $namespace, array $cases, ?string $backed = null)
+    {
+        $this->enum = new GeneratingEnum($namespace, Backed::backCases($cases, $backed));
+    }
 
     /**
      * Generate the given enum.

@@ -94,33 +94,6 @@ function parseCaseValue(string $raw): array
 }
 
 /**
- * Retrieve the given cases, optionally backed by values.
- *
- * @param string[] $cases
- * @return array<string, string|int|null>
- * @throws \ValueError
- */
-function backCases(array $cases, ?string $backed): array
-{
-    $backedCases = [];
-
-    $backed = match (true) {
-        is_string($backed) => Backed::fromName($backed),
-        default => str_contains($cases[0] ?? '', '=') ? Backed::custom : Backed::pure,
-    };
-
-    $pairs = $backed->yieldPairs();
-
-    foreach ($cases as $case) {
-        $backedCases += $pairs->send($case);
-
-        $pairs->next();
-    }
-
-    return $backedCases;
-}
-
-/**
  * Retrieve the backing type depending on the given value.
  */
 function backingType(mixed $value): ?string

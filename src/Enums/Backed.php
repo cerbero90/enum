@@ -50,6 +50,43 @@ enum Backed
     case bitwise;
 
     /**
+     * Retrieve the given cases, optionally backed by the provided backing strategy.
+     *
+     * @param string[] $cases
+     * @return array<string, string|int|null>
+     * @throws \ValueError
+     */
+    public static function backCases(array $cases, ?string $strategy = null): array
+    {
+        $backed = match (true) {
+            is_string($strategy) => self::fromName($strategy),
+            default => str_contains($cases[0] ?? '', '=') ? self::custom : self::pure,
+        };
+
+        return $backed->back($cases);
+    }
+
+    /**
+     * Retrieve the given cases after backing them.
+     *
+     * @param string[] $cases
+     * @return array<string, string|int|null>
+     */
+    public function back(array $cases): array
+    {
+        $backedCases = [];
+        $pairs = $this->yieldPairs();
+
+        foreach ($cases as $case) {
+            $backedCases += $pairs->send($case);
+
+            $pairs->next();
+        }
+
+        return $backedCases;
+    }
+
+    /**
      * Yield the case-value pairs.
      *
      * @return Generator<int, array<string, string|int|null>>

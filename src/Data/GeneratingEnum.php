@@ -50,7 +50,7 @@ class GeneratingEnum
 
         $this->path = namespaceToPath($fullNamespace);
 
-        $this->exists = file_exists($this->path);
+        $this->exists = enum_exists($fullNamespace);
 
         $this->backingType = backingType(reset($cases));
     }
