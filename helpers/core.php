@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Cerbero\Enum;
 
-use Cerbero\Enum\Enums\Backed;
 use Generator;
 
 /**

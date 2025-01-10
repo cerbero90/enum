@@ -20,6 +20,7 @@ class Generator
     /**
      * Instantiate the class.
      *
+     * @param class-string<\UnitEnum> $namespace
      * @param string[] $cases
      * @throws \ValueError
      */
