@@ -1,0 +1,36 @@
+Annotate enums to ease IDE autocompletion.
+
+Usage: enum annotate enum1 [enum2 ...]
+
+Available options:
+
+    -a, --all               Whether all enums should be annotated
+    -f, --force             Whether existing annotations should be overwritten
+
+Examples:
+    enum annotate App/Enums/MyEnum
+    enum annotate "App\Enums\MyEnum"
+    enum annotate App/Enums/MyEnum1 App/Enums/MyEnum2
+    enum annotate App/Enums/MyEnum --force
+    enum annotate --all
+    enum annotate --all --force
+
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+Create a new enum.
+
+Usage: enum make enum case1 case2
+
+Available options:
+
+    --backed=VALUE          How cases should be backed. VALUE is either:
+                            snake|camel|kebab|upper|lower|int0|int1|bitwise
+    -f, --force             Whether the existing enum should be overwritten
+
+Examples:
+    enum make App/Enums/MyEnum Case1 Case2
+    enum make "App\Enums\MyEnum" Case1 Case2
+    enum make App/Enums/MyEnum Case1=value1 Case2=value2
+    enum make App/Enums/MyEnum Case1 Case2 --backed=int1
+    enum make App/Enums/MyEnum Case1 Case2 --force
+    enum make App/Enums/MyEnum Case1 Case2 --backed=bitwise --force
