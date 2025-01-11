@@ -138,8 +138,7 @@ function runAnnotate(string $enum, bool $force = false): bool
 
     $succeeded = cli("annotate \"{$enum}\"" . ($force ? ' --force' : ''));
 
-    var_dump(ob_get_clean());
-    // ob_end_clean();
+    ob_end_clean();
 
     return $succeeded;
 }
@@ -156,6 +155,6 @@ function cli(string $command, ?int &$status = null): bool
         Enums::basePath(),
         implode(',', Enums::paths()),
     ]);
-var_dump($cmd);
+
     return passthru($cmd, $status) === null;
 }

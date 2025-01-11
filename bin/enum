@@ -41,7 +41,7 @@ if (in_array($command = $argv[1] ?? null, $allowedCommands)) {
  * @param string[] $options
  */
 function annotate(array $arguments, array $options): bool
-{var_dump($arguments, $options);
+{
     $enums = array_intersect(['--all', '-a'], $options) ? [...Enums::namespaces()] : normalizeEnums($arguments);
 
     if (empty($enums)) {
