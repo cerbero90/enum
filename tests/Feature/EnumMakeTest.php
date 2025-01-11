@@ -37,4 +37,4 @@ it('generates annotated enums', function(string $enum, string $backed) {
 })->with([
     ['App\Enums\Generated1', 'bitwise'],
     ['Domain\Common\Enums\Generated2', 'snake'],
-])->skipOnLinux();
+])->skip(PHP_OS_FAMILY == 'Linux', 'Currently skipping for unknown behavior on Linux');
