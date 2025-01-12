@@ -39,6 +39,7 @@ composer require cerbero/enum
 * [🦾 Console commands](#-console-commands)
   * [🗒️ annotate](#%EF%B8%8F-annotate)
   * [🏗️ make](#%EF%B8%8F-make)
+  * [💙 ts](#%EF%B8%8F-ts)
 
 To supercharge our enums with all the features provided by this package, we can let our enums use the `Enumerates` trait:
 
@@ -406,6 +407,24 @@ This package provides a handy binary, built to automate different tasks. To lear
 ./vendor/bin/enum
 ```
 
+For the console commands to work properly, the application base path is automatically guessed. However, in case of issues, we can manually set it by creating an `enums.php` file in the root of our app:
+
+```php
+<?php
+
+use Cerbero\Enum\Enums;
+
+Enums::setBasePath(__DIR__);
+```
+
+Some commands support the option `--all` to reference all the enums of our application. We can set the paths where enums live in our app in the `enums.php` configuration file as well:
+
+```php
+Enums::setPaths('app/Enums', 'domain/*/Enums');
+```
+
+In the above example, enums are discovered in the `app/Enums` directory and in all `Enums` sub-folders belonging to `domain`, e.g. `domain/Posts/Enums`, `domain/Users/Enums`, etc.
+
 #### 🗒️ annotate
 
 The `annotate` command automatically adds method annotations to enums, making IDEs autocompletion possible:
@@ -432,28 +451,12 @@ Otherwise we can annotate all our enums at once by enabling the option `--all`:
 ./vendor/bin/enum annotate -a
 ```
 
-For the option `--all` to work, we need to set the paths where enums live in our application:
-
-```php
-use Cerbero\Enum\Enums;
-
-Enums::setPaths('app/Enums', 'domain/*/Enums');
-```
-
-In the above example, enums are discovered in the `app/Enums` directory and in all `Enums` sub-folders belonging to `domain`, e.g. `domain/Posts/Enums`, `domain/Users/Enums`, etc.
-
-This package tries to automatically find the application base path. However if enums can't be discovered after setting their paths, we can manually set our application base path:
-
-```php
-Enums::setBasePath(__DIR__ . '/path/to/our/app');
-```
-
 If we want to overwrite method annotations already annotated on enums, we can add the option `--force`:
 
 ```bash
-php artisan enum:annotate App/Enums/Enum --force
+./vendor/bin/enum annotate App/Enums/Enum --force
 
-php artisan enum:annotate App/Enums/Enum -f
+./vendor/bin/enum annotate App/Enums/Enum -f
 ```
 
 #### 🏗️ make
@@ -497,10 +500,66 @@ php artisan enum:make App/Enums/Enum CaseOne CaseTwo --force
 php artisan enum:make App/Enums/Enum CaseOne CaseTwo -f
 ```
 
-This package tries to automatically find the application base path. However if enums can't be successfully created, we can manually set our application base path:
+Finally, we can generate the TypeScript counterpart of the newly created enum by adding the `--typescript` option:
+
+```bash
+php artisan enum:make App/Enums/Enum CaseOne CaseTwo --typescript
+
+php artisan enum:make App/Enums/Enum CaseOne CaseTwo -t
+```
+
+#### 💙 ts
+
+The `ts` command turns enums into their TypeScript counterpart, synchronizing backend with frontend:
+
+```bash
+./vendor/bin/enum ts App/Enums/Enum
+
+./vendor/bin/enum ts "App\Enums\Enum"
+```
+
+We can provide more than one enum to synchronize in TypeScript, if needed:
+
+```bash
+./vendor/bin/enum ts App/Enums/Enum1 App/Enums/Enum2
+
+./vendor/bin/enum ts "App\Enums\Enum1" "App\Enums\Enum2"
+```
+
+Otherwise we can synchronize all our enums at once by enabling the option `--all`:
+
+```bash
+./vendor/bin/enum ts --all
+
+./vendor/bin/enum ts -a
+```
+
+By default enums are synchronized in `resources/js/enums/index.ts`, however we can customize it in our `enums.php` configuration file:
 
 ```php
-Enums::setBasePath(__DIR__ . '/path/to/our/app');
+<?php
+
+use Cerbero\Enum\Enums;
+
+// custom static path
+Enums::setTypeScript('frontend/enums/index.ts');
+
+// custom dynamic path
+Enums::setTypeScript(function (string $enum) {
+    $domain = explode('\\', $enum)[1];
+
+    return "resources/js/modules/{$domain}/enums.ts";
+});
+```
+
+As seen above, we can either set a static path for our TypeScript enums or dynamically set the TypeScript path of an enum depending on its namespace.
+
+If we want to update previously synchronized enums, we can add the option `--force`:
+
+```bash
+./vendor/bin/enum ts App/Enums/Enum --force
+
+./vendor/bin/enum ts App/Enums/Enum -f
 ```
 
 ## 📆 Change log

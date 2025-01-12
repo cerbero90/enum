@@ -148,13 +148,31 @@ function runAnnotate(string $enum, bool $force = false): bool
  */
 function cli(string $command, ?int &$status = null): bool
 {
-    $cmd = vsprintf('"%s" "%s" %s --base-path="%s" --paths="%s" 2>&1', [
+    $cmd = vsprintf('"%s" "%s" %s 2>&1', [
         PHP_BINARY,
         path(__DIR__ . '/../bin/enum'),
         $command,
-        Enums::basePath(),
-        implode(',', Enums::paths()),
     ]);
 
     return passthru($cmd, $status) === null;
+}
+
+/**
+ * Synchronize the given enum in TypeScript within a new process.
+ *
+ * @param class-string<\UnitEnum> $enum
+ */
+function runTs(string $enum, bool $force = false): bool
+{
+    // Once an enum is loaded, PHP accesses it from the memory and not from the disk.
+    // Since we are writing on the disk, the enum in memory might get out of sync.
+    // To make sure that we are synchronizing the current content of such enum,
+    // we spin a new process to load in memory the latest state of the enum.
+    ob_start();
+
+    $succeeded = cli("ts \"{$enum}\"" . ($force ? ' --force' : ''));
+
+    ob_end_clean();
+
+    return $succeeded;
 }

@@ -29,6 +29,13 @@ class Enums
     protected static array $paths = [];
 
     /**
+     * The TypeScript path to sync enums in.
+     *
+     * @var Closure(class-string<UnitEnum>|string $enum): string|string
+     */
+    protected static Closure|string $typeScript = 'resources/js/enums/index.ts';
+
+    /**
      * The logic to run when an inaccessible enum method is called.
      *
      * @var ?Closure(class-string<UnitEnum> $enum, string $name, array<array-key, mixed> $arguments): mixed
@@ -86,6 +93,28 @@ class Enums
     }
 
     /**
+     * Set the TypeScript path to sync enums in.
+     *
+     * @param callable(class-string<UnitEnum>|string $enum): string|string $path
+     */
+    public static function setTypeScript(callable|string $path): void
+    {
+        /** @phpstan-ignore assign.propertyType */
+        static::$typeScript = is_callable($path) ? $path(...) : $path;
+    }
+
+    /**
+     * Retrieve the TypeScript path, optionally for the given enum.
+     *
+     * @param class-string<UnitEnum>|string $enum
+     * @return string
+     */
+    public static function typeScript(string $enum = ''): string
+    {
+        return static::$typeScript instanceof Closure ? (static::$typeScript)($enum) : static::$typeScript;
+    }
+
+    /**
      * Yield the namespaces of all the application enums.
      *
      * @return Generator<int, class-string<UnitEnum>>
@@ -127,26 +156,6 @@ class Enums
     }
 
     /**
-     * Set the logic to run when an inaccessible case method is called.
-     *
-     * @param callable(UnitEnum $case, string $name, array<array-key, mixed> $arguments): mixed $callback
-     */
-    public static function onCall(callable $callback): void
-    {
-        static::$onCall = $callback(...);
-    }
-
-    /**
-     * Set the logic to run when a case is invoked.
-     *
-     * @param callable(UnitEnum $case, mixed ...$arguments): mixed $callback
-     */
-    public static function onInvoke(callable $callback): void
-    {
-        static::$onInvoke = $callback(...);
-    }
-
-    /**
      * Handle the call to an inaccessible enum method.
      *
      * @param class-string<UnitEnum> $enum
@@ -160,6 +169,16 @@ class Enums
     }
 
     /**
+     * Set the logic to run when an inaccessible case method is called.
+     *
+     * @param callable(UnitEnum $case, string $name, array<array-key, mixed> $arguments): mixed $callback
+     */
+    public static function onCall(callable $callback): void
+    {
+        static::$onCall = $callback(...);
+    }
+
+    /**
      * Handle the call to an inaccessible case method.
      *
      * @param array<array-key, mixed> $arguments
@@ -167,6 +186,16 @@ class Enums
     public static function handleCall(UnitEnum $case, string $name, array $arguments): mixed
     {
         return static::$onCall ? (static::$onCall)($case, $name, $arguments) : $case->resolveMetaAttribute($name);
+    }
+
+    /**
+     * Set the logic to run when a case is invoked.
+     *
+     * @param callable(UnitEnum $case, mixed ...$arguments): mixed $callback
+     */
+    public static function onInvoke(callable $callback): void
+    {
+        static::$onInvoke = $callback(...);
     }
 
     /**

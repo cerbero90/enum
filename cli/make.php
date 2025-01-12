@@ -9,6 +9,7 @@ use function Cerbero\Enum\enumOutcome;
 use function Cerbero\Enum\fail;
 use function Cerbero\Enum\option;
 use function Cerbero\Enum\runAnnotate;
+use function Cerbero\Enum\runTs;
 use function Cerbero\Enum\succeed;
 
 if (! $enum = strtr($arguments[0] ?? '', '/', '\\')) {
@@ -31,4 +32,10 @@ try {
     return fail('The option --backed supports only ' . implode(', ', Backed::names()));
 }
 
-return enumOutcome($enum, fn() => $generator->generate($force) && runAnnotate($enum, $force));
+$typeScript = !! array_intersect(['--typescript', '-t'], $options);
+
+return enumOutcome($enum, function () use ($generator, $enum, $force, $typeScript) {
+    return $generator->generate($force)
+        && runAnnotate($enum, $force)
+        && ($typeScript ? runTs($enum, $force) : true);
+});

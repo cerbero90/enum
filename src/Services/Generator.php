@@ -7,6 +7,8 @@ namespace Cerbero\Enum\Services;
 use Cerbero\Enum\Data\GeneratingEnum;
 use Cerbero\Enum\Enums\Backed;
 
+use function Cerbero\Enum\ensureParentDirectory;
+
 /**
  * The enums generator.
  */
@@ -38,9 +40,7 @@ class Generator
             return true;
         }
 
-        if (! file_exists($directory = dirname($this->enum->path))) {
-            mkdir($directory, 0755, recursive: true);
-        }
+        ensureParentDirectory($this->enum->path);
 
         $stub = (string) file_get_contents($this->stub());
         $content = strtr($stub, $this->replacements());

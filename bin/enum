@@ -9,6 +9,7 @@ use function Cerbero\Enum\splitArgv;
 
 is_file($autoload = dirname(__DIR__, 1) . '/vendor/autoload.php') && require $autoload;
 is_file($autoload = dirname(__DIR__, 4) . '/vendor/autoload.php') && require $autoload;
+is_file($autoload = dirname(__DIR__, 4) . '/enums.php') && require $autoload;
 
 if (is_file($command = path(__DIR__ . '/../cli/' . ($argv[1] ?? null) . '.php'))) {
     try {
@@ -24,5 +25,3 @@ if (is_file($command = path(__DIR__ . '/../cli/' . ($argv[1] ?? null) . '.php'))
 }
 
 require path(__DIR__ . '/../cli/help');
-
-?>

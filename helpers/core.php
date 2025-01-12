@@ -187,3 +187,15 @@ function path(string $path): string
 
     return $head . implode(DIRECTORY_SEPARATOR, $segments);
 }
+
+/**
+ * Create the directory for the given path if missing.
+ */
+function ensureParentDirectory(string $path): bool
+{
+    if (file_exists($directory = dirname($path))) {
+        return true;
+    }
+
+    return mkdir($directory, 0755, recursive: true);
+}
