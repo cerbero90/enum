@@ -115,9 +115,9 @@ function enumOutcome(string $enum, Closure $callback): bool
     }
 
     if ($succeeded) {
-        fwrite(STDOUT, "\e[48;2;163;230;53m\e[38;2;63;98;18m\e[1m DONE \e[0m {$enum}" . PHP_EOL);
+        fwrite(STDOUT, "\e[48;2;163;230;53m\e[38;2;63;98;18m\e[1m DONE \e[0m {$enum}" . PHP_EOL . PHP_EOL);
     } else {
-        fwrite(STDERR, "\e[48;2;248;113;113m\e[38;2;153;27;27m\e[1m FAIL \e[0m {$enum} {$error}" . PHP_EOL);
+        fwrite(STDERR, "\e[48;2;248;113;113m\e[38;2;153;27;27m\e[1m FAIL \e[0m {$enum} {$error}" . PHP_EOL . PHP_EOL);
     }
 
     return $succeeded;
