@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Common\Enums;
+
+use Cerbero\Enum\Concerns\Enumerates;
+
+enum Generated2: string
+{
+    use Enumerates;
+
+    case CaseOne = 'case_one';
+
+    case CaseTwo = 'case_two';
+}
