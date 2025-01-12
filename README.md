@@ -39,7 +39,7 @@ composer require cerbero/enum
 * [🦾 Console commands](#-console-commands)
   * [🗒️ annotate](#%EF%B8%8F-annotate)
   * [🏗️ make](#%EF%B8%8F-make)
-  * [💙 ts](#%EF%B8%8F-ts)
+  * [💙 ts](#-ts)
 
 To supercharge our enums with all the features provided by this package, we can let our enums use the `Enumerates` trait:
 
