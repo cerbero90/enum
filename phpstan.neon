@@ -3,12 +3,7 @@ parameters:
     paths:
         - src
     ignoreErrors:
-        -
-            messages:
-                - '#Cannot call method [a-zA-Z0-9\\_]+\(\) on TValue of mixed.#'
-                - '#Cannot access property \$(?:name|value) on TValue of mixed#'
-            path: src/CasesCollection.php
-        -
-            identifier: trait.unused
+        - '#Access to an undefined property (?:TEnum of )?[a-zA-Z0-9\\_]+::\$value.#'
+        - '#Call to an undefined (?:static )?method (?:TEnum of )?UnitEnum::[a-zA-Z0-9\\_]+\(\).#'
 includes:
     - phpstan-baseline.neon

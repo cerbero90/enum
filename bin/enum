@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+
+<?php
+
+use function Cerbero\Enum\fail;
+use function Cerbero\Enum\path;
+use function Cerbero\Enum\setPathsByOptions;
+use function Cerbero\Enum\splitArgv;
+
+is_file($autoload = dirname(__DIR__, 1) . '/vendor/autoload.php') && require $autoload;
+is_file($autoload = dirname(__DIR__, 4) . '/vendor/autoload.php') && require $autoload;
+is_file($autoload = dirname(__DIR__, 4) . '/enums.php') && require $autoload;
+
+if (is_file($command = path(__DIR__ . '/../cli/' . ($argv[1] ?? null) . '.php'))) {
+    try {
+        [$arguments, $options] = splitArgv($argv);
+        setPathsByOptions($options);
+
+        $outcome = require $command;
+    } catch (Throwable $e) {
+        $outcome = fail($e->getMessage());
+    }
+
+    exit($outcome ? 0 : 1);
+}
+
+require path(__DIR__ . '/../cli/help');

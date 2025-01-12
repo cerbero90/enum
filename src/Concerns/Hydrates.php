@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Cerbero\Enum\Concerns;
 
 use Cerbero\Enum\CasesCollection;
@@ -61,7 +63,7 @@ trait Hydrates
     /**
      * Retrieve all the cases hydrated from the given meta or fail.
      *
-     * @return CasesCollection<array-key, self>
+     * @return CasesCollection<self>
      * @throws ValueError
      */
     public static function fromMeta(string $meta, mixed $value = true): CasesCollection
@@ -76,7 +78,7 @@ trait Hydrates
     /**
      * Retrieve all the cases hydrated from the given meta or NULL.
      *
-     * @return ?CasesCollection<array-key, self>
+     * @return ?CasesCollection<self>
      */
     public static function tryFromMeta(string $meta, mixed $value = true): ?CasesCollection
     {

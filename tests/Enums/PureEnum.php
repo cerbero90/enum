@@ -1,6 +1,6 @@
 <?php
 
-namespace Cerbero\Enum;
+namespace Cerbero\Enum\Enums;
 
 use Cerbero\Enum\Attributes\Meta;
 use Cerbero\Enum\Concerns\Enumerates;

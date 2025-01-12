@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Cerbero\Enum;
 
 use Closure;
+use Generator;
+use GlobIterator;
+use UnitEnum;
 
 /**
  * The enums manager.
@@ -12,30 +15,140 @@ use Closure;
 class Enums
 {
     /**
+     * The application base path.
+     *
+     * @var string
+     */
+    protected static ?string $basePath = null;
+
+    /**
+     * The glob paths to find enums in.
+     *
+     * @var string[]
+     */
+    protected static array $paths = [];
+
+    /**
+     * The TypeScript path to sync enums in.
+     *
+     * @var Closure(class-string<UnitEnum>|string $enum): string|string
+     */
+    protected static Closure|string $typeScript = 'resources/js/enums/index.ts';
+
+    /**
      * The logic to run when an inaccessible enum method is called.
      *
-     * @var ?Closure(class-string $enum, string $name, array<array-key, mixed> $arguments): mixed
+     * @var ?Closure(class-string<UnitEnum> $enum, string $name, array<array-key, mixed> $arguments): mixed
      */
     protected static ?Closure $onStaticCall = null;
 
     /**
      * The logic to run when an inaccessible case method is called.
      *
-     * @var ?Closure(object $case, string $name, array<array-key, mixed> $arguments): mixed
+     * @var ?Closure(UnitEnum $case, string $name, array<array-key, mixed> $arguments): mixed
      */
     protected static ?Closure $onCall = null;
 
     /**
      * The logic to run when a case is invoked.
      *
-     * @var ?Closure(object $case, mixed ...$arguments): mixed
+     * @var ?Closure(UnitEnum $case, mixed ...$arguments): mixed
      */
     protected static ?Closure $onInvoke = null;
 
     /**
+     * Set the application base path.
+     */
+    public static function setBasePath(string $path): void
+    {
+        static::$basePath = path($path);
+    }
+
+    /**
+     * Retrieve the application base path, optionally appending the given path.
+     */
+    public static function basePath(?string $path = null): string
+    {
+        $basePath = static::$basePath ?: dirname(__DIR__, 4);
+
+        return $path === null ? $basePath : $basePath . DIRECTORY_SEPARATOR . ltrim(path($path), '\/');
+    }
+
+    /**
+     * Set the glob paths to find all the application enums.
+     */
+    public static function setPaths(string ...$paths): void
+    {
+        static::$paths = array_map(path(...), $paths);
+    }
+
+    /**
+     * Retrieve the paths to find all the application enums.
+     *
+     * @return string[]
+     */
+    public static function paths(): array
+    {
+        return static::$paths;
+    }
+
+    /**
+     * Set the TypeScript path to sync enums in.
+     *
+     * @param callable(class-string<UnitEnum>|string $enum): string|string $path
+     */
+    public static function setTypeScript(callable|string $path): void
+    {
+        /** @phpstan-ignore assign.propertyType */
+        static::$typeScript = is_callable($path) ? $path(...) : $path;
+    }
+
+    /**
+     * Retrieve the TypeScript path, optionally for the given enum.
+     *
+     * @param class-string<UnitEnum>|string $enum
+     * @return string
+     */
+    public static function typeScript(string $enum = ''): string
+    {
+        return static::$typeScript instanceof Closure ? (static::$typeScript)($enum) : static::$typeScript;
+    }
+
+    /**
+     * Yield the namespaces of all the application enums.
+     *
+     * @return Generator<int, class-string<UnitEnum>>
+     */
+    public static function namespaces(): Generator
+    {
+        $psr4 = psr4();
+
+        foreach (static::paths() as $path) {
+            $pattern = static::basePath($path) . DIRECTORY_SEPARATOR . '*.php';
+
+            foreach (new GlobIterator($pattern) as $fileInfo) {
+                /** @var \SplFileInfo $fileInfo */
+                $enumPath = (string) $fileInfo->getRealPath();
+
+                foreach ($psr4 as $root => $relative) {
+                    $absolute = static::basePath($relative) . DIRECTORY_SEPARATOR;
+
+                    if (str_starts_with($enumPath, $absolute)) {
+                        $enum = strtr($enumPath, [$absolute => $root, '/' => '\\', '.php' => '']);
+
+                        if (enum_exists($enum)) {
+                            yield $enum;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Set the logic to run when an inaccessible enum method is called.
      *
-     * @param callable(class-string $enum, string $name, array<array-key, mixed> $arguments): mixed $callback
+     * @param callable(class-string<UnitEnum> $enum, string $name, array<array-key, mixed> $arguments): mixed $callback
      */
     public static function onStaticCall(callable $callback): void
     {
@@ -43,29 +156,9 @@ class Enums
     }
 
     /**
-     * Set the logic to run when an inaccessible case method is called.
-     *
-     * @param callable(object $case, string $name, array<array-key, mixed> $arguments): mixed $callback
-     */
-    public static function onCall(callable $callback): void
-    {
-        static::$onCall = $callback(...);
-    }
-
-    /**
-     * Set the logic to run when a case is invoked.
-     *
-     * @param callable(object $case, mixed ...$arguments): mixed $callback
-     */
-    public static function onInvoke(callable $callback): void
-    {
-        static::$onInvoke = $callback(...);
-    }
-
-    /**
      * Handle the call to an inaccessible enum method.
      *
-     * @param class-string $enum
+     * @param class-string<UnitEnum> $enum
      * @param array<array-key, mixed> $arguments
      */
     public static function handleStaticCall(string $enum, string $name, array $arguments): mixed
@@ -76,22 +169,40 @@ class Enums
     }
 
     /**
+     * Set the logic to run when an inaccessible case method is called.
+     *
+     * @param callable(UnitEnum $case, string $name, array<array-key, mixed> $arguments): mixed $callback
+     */
+    public static function onCall(callable $callback): void
+    {
+        static::$onCall = $callback(...);
+    }
+
+    /**
      * Handle the call to an inaccessible case method.
      *
      * @param array<array-key, mixed> $arguments
      */
-    public static function handleCall(object $case, string $name, array $arguments): mixed
+    public static function handleCall(UnitEnum $case, string $name, array $arguments): mixed
     {
-        /** @phpstan-ignore method.notFound */
         return static::$onCall ? (static::$onCall)($case, $name, $arguments) : $case->resolveMetaAttribute($name);
+    }
+
+    /**
+     * Set the logic to run when a case is invoked.
+     *
+     * @param callable(UnitEnum $case, mixed ...$arguments): mixed $callback
+     */
+    public static function onInvoke(callable $callback): void
+    {
+        static::$onInvoke = $callback(...);
     }
 
     /**
      * Handle the invocation of a case.
      */
-    public static function handleInvoke(object $case, mixed ...$arguments): mixed
+    public static function handleInvoke(UnitEnum $case, mixed ...$arguments): mixed
     {
-        /** @phpstan-ignore method.notFound */
         return static::$onInvoke ? (static::$onInvoke)($case, ...$arguments) : $case->value();
     }
 }

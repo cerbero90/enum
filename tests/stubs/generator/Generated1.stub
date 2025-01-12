@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Enums;
+
+use Cerbero\Enum\Concerns\Enumerates;
+
+enum Generated1: int
+{
+    use Enumerates;
+
+    case CaseOne = 1 << 0;
+
+    case CaseTwo = 1 << 1;
+}
