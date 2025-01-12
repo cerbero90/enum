@@ -37,4 +37,4 @@ it('annotates all the discoverable enums', function() {
 
     (fn() => self::$paths = [])->bindTo(null, Enums::class)();
     (fn() => self::$basePath = null)->bindTo(null, Enums::class)();
-});
+})->skip(PHP_OS_FAMILY == 'Windows', 'Windows is ending one line differently');
