@@ -13,7 +13,7 @@ it('annotates enums', function(string $enum) {
     App\Enums\Enum2::class,
     Domain\Common\Enums\Enum3::class,
     Domain\Payouts\Enums\Enum4::class,
-]);
+])->skip(PHP_OS_FAMILY == 'Windows', 'Windows is ending one line differently');
 
 it('annotates enums overwriting existing annotations', function() {
     $enum = Domain\Common\Enums\Enum3::class;
