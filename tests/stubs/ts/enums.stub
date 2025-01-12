@@ -1,0 +1,21 @@
+export enum Enum1 {
+    One = 1,
+    Two = 2,
+    Three = 3,
+}
+
+export enum Enum2 {
+
+}
+
+export enum Enum3 {
+    One = 'number 1',
+    Two = 'number 2',
+    Three = 'number 3',
+}
+
+export enum Enum4 {
+    One = 1,
+    Two = 2,
+    Three = 4,
+}

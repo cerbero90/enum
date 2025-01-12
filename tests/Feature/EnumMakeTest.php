@@ -30,7 +30,7 @@ it('generates annotated enums', function(string $enum, string $backed) {
     Enums::setBasePath(__DIR__ . '/../Skeleton');
     Enums::setPaths('app/Enums', 'domain/*/Enums');
 
-    expect(fn() => runEnum("make \"{$enum}\" CaseOne CaseTwo --backed={$backed}"))->toGenerate($enum);
+    expect(fn() => runEnum("make \"{$enum}\" CaseOne CaseTwo --backed={$backed}"))->toGenerate($enum, cli: true);
 
     (fn() => self::$paths = [])->bindTo(null, Enums::class)();
     (fn() => self::$basePath = null)->bindTo(null, Enums::class)();

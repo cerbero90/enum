@@ -1,0 +1,5 @@
+export enum Enum3 {
+    One = 'number 1',
+    Two = 'number 2',
+    Three = 'number 3',
+}

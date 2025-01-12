@@ -24,9 +24,12 @@
 |
 */
 
+use Cerbero\Enum\Enums;
+
 use function Cerbero\Enum\className;
 use function Cerbero\Enum\cli;
 use function Cerbero\Enum\namespaceToPath;
+use function Cerbero\Enum\path;
 
 expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) {
     $oldContents = [];
@@ -38,13 +41,7 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
     }
 
     try {
-        if (is_bool($value = ($this->value)())) {
-            expect($value)->toBeTrue();
-        } else {
-            expect($value)
-                ->output->toContain(...$enums)
-                ->status->toBe(0);
-        }
+        expect($this->value)->toProcessEnums($enums);
 
         foreach ($oldContents as $filename => $oldContent) {
             $stub = __DIR__ . '/stubs/annotate/' . basename($filename, '.php') . '.stub';
@@ -53,11 +50,7 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
                 $stub = $path;
             }
 
-            // normalize content to avoid end-of-line incompatibility between OS
-            $enumContent = str_replace("\r\n", "\n", file_get_contents($filename));
-            $stubContent = str_replace("\r\n", "\n", file_get_contents($stub));
-
-            expect($enumContent)->toBe($stubContent);
+            expect($filename)->toContainIgnoreEol($stub);
         }
     } finally {
         foreach ($oldContents as $filename => $oldContent) {
@@ -66,32 +59,58 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
     }
 });
 
-expect()->extend('toGenerate', function (string $enum) {
+expect()->extend('toProcessEnums', function (array $enums) {
+    $value = ($this->value)();
+
+    if (is_bool($value)) {
+        expect($value)->toBeTrue();
+    } else {
+        expect($value)
+            ->output->toContain(...$enums)
+            ->status->toBe(0);
+    }
+});
+
+expect()->extend('toContainIgnoreEol', function (string $path) {
+    // normalize content to avoid end-of-line incompatibility between OS
+    $actualContent = str_replace("\r\n", "\n", file_get_contents(path($this->value)));
+    $expectedContent = str_replace("\r\n", "\n", file_get_contents(path($path)));
+
+    expect($actualContent)->toBe($expectedContent);
+});
+
+expect()->extend('toGenerate', function (string $enum, bool $cli = false) {
     expect(class_exists($enum))->toBeFalse();
 
-    $directory = 'make';
-
     try {
-        if (is_bool($value = ($this->value)())) {
-            expect($value)->toBeTrue();
-
-            $directory = 'generator';
-        } else {
-            expect($value)
-                ->output->toContain($enum)
-                ->status->toBe(0);
-        }
+        expect($this->value)->toProcessEnums([$enum]);
 
         $filename = namespaceToPath($enum);
+        $directory = $cli ? 'make' : 'generator';
         $stub = sprintf('%s/stubs/%s/%s.stub', __DIR__, $directory, className($enum));
 
-        // normalize content to avoid end-of-line incompatibility between OS
-        $enumContent = str_replace("\r\n", "\n", file_get_contents($filename));
-        $stubContent = str_replace("\r\n", "\n", file_get_contents($stub));
-
-        expect($enumContent)->toBe($stubContent);
+        expect($filename)->toContainIgnoreEol($stub);
     } finally {
         file_exists($filename) && unlink($filename);
+    }
+});
+
+expect()->extend('toTypeScript', function (array $enums, bool $oneFile = true) {
+    expect($this->value)->toProcessEnums($enums);
+
+    $paths = [];
+
+    try {
+        foreach ($enums as $enum) {
+            $paths[] = $path = Enums::basePath(Enums::typeScript($enum));
+            $stub = sprintf('%s/stubs/ts/%s.stub', __DIR__, $oneFile ? 'enums' : className($enum));
+
+            expect($path)->toContainIgnoreEol($stub);
+        }
+    } finally {
+        foreach ($paths as $path) {
+            file_exists($path) && unlink($path);
+        }
     }
 });
 
@@ -113,9 +132,11 @@ expect()->extend('toGenerate', function (string $enum) {
  */
 function runEnum(string $command): stdClass
 {
+    $paths = sprintf('--base-path="%s" --paths="%s"', Enums::basePath(), implode(',', Enums::paths()));
+
     ob_start();
 
-    cli($command, $status);
+    cli("{$command} {$paths}", $status);
 
     $output = ob_get_clean();
 
