@@ -26,6 +26,19 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
+## 2.3.0 - 2024-12-22
+
+### Added
+- Enums discoverability
+- Console command to create an enum
+- Console command to annotate enums
+- Console command to turn PHP enums into TypeScript enums
+
+### Changed
+- Improved static analysis
+- CasesCollection::groupBy() does not wrap the result into a collection
+
+
 ## 2.2.1 - 2024-11-22
 
 ### Added
