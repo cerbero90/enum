@@ -45,9 +45,10 @@ expect()->extend('toAnnotate', function (array $enums, bool $overwrite = false) 
 
         foreach ($oldContents as $filename => $oldContent) {
             $stub = __DIR__ . '/stubs/annotate/' . basename($filename, '.php') . '.stub';
+            $forceStub = __DIR__ . '/stubs/annotate/' . basename($filename, '.php') . '.force.stub';
 
-            if ($overwrite && file_exists($path = __DIR__ . '/stubs/' . basename($filename, '.php') . '.force.stub')) {
-                $stub = $path;
+            if ($overwrite && file_exists($forceStub)) {
+                $stub = $forceStub;
             }
 
             expect($filename)->toContainIgnoreEol($stub);

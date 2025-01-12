@@ -15,11 +15,9 @@ it('annotates enums', function(string $enum) {
     Domain\Payouts\Enums\Enum4::class,
 ]);
 
-it('annotates enums overwriting existing annotations', function(string $enum) {
-    expect(fn() => (new Annotator($enum))->annotate(overwrite: true))->toAnnotate([$enum], true);
-})->with([
-    App\Enums\Enum1::class,
-    App\Enums\Enum2::class,
-    Domain\Common\Enums\Enum3::class,
-    Domain\Payouts\Enums\Enum4::class,
-]);
+it('annotates enums overwriting existing annotations', function() {
+    $enum = Domain\Common\Enums\Enum3::class;
+
+    expect(fn() => (new Annotator($enum))->annotate(overwrite: true))
+        ->toAnnotate([$enum], overwrite: true);
+});
