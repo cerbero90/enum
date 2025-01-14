@@ -26,7 +26,13 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
-## 2.3.0 - 2024-12-22
+## 2.3.1 - 2025-01-15
+
+### Changed
+- Removed unneeded readonly modifiers
+
+
+## 2.3.0 - 2025-01-12
 
 ### Added
 - Enums discoverability

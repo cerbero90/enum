@@ -149,7 +149,7 @@ BackedEnum::Two->color(); // green
 ```
 
 > [!TIP]
-> Our IDE can autocomplete meta methods thanks to the [`annotate` command](#-annotate).
+> Our IDE can autocomplete meta methods thanks to the [`annotate` command](#%EF%B8%8F-annotate).
 
 `#[Meta]` attributes can also be attached to the enum itself to provide default values when a case does not declare its own meta values:
 
@@ -319,7 +319,7 @@ BackedEnum::One(); // 1
 ```
 
 > [!TIP]
-> Our IDE can autocomplete cases static methods thanks to the [`annotate` command](#-annotate).
+> Our IDE can autocomplete cases static methods thanks to the [`annotate` command](#%EF%B8%8F-annotate).
 
 We can also obtain the name or value of a case by simply invoking it:
 
@@ -340,7 +340,7 @@ BackedEnum::One->shape(); // 'triangle'
 ```
 
 > [!TIP]
-> Our IDE can autocomplete meta methods thanks to the [`annotate` command](#-annotate).
+> Our IDE can autocomplete meta methods thanks to the [`annotate` command](#%EF%B8%8F-annotate).
 
 Depending on our needs, we can customize the default behavior of all enums in our application when invoking a case or calling inaccessible methods:
 
@@ -500,7 +500,7 @@ php artisan enum:make App/Enums/Enum CaseOne CaseTwo --force
 php artisan enum:make App/Enums/Enum CaseOne CaseTwo -f
 ```
 
-Finally, we can generate the TypeScript counterpart of the newly created enum by adding the `--typescript` option:
+We can generate the TypeScript counterpart of the newly created enum by adding the `--typescript` option:
 
 ```bash
 php artisan enum:make App/Enums/Enum CaseOne CaseTwo --typescript

@@ -32,8 +32,8 @@ class MethodAnnotations implements IteratorAggregate
      * @param Inspector<UnitEnum> $inspector
      */
     public function __construct(
-        protected readonly Inspector $inspector,
-        protected readonly bool $includeExisting,
+        protected Inspector $inspector,
+        protected bool $includeExisting,
     ) {}
 
     /**
