@@ -17,7 +17,7 @@ class Generator
     /**
      * The enum being generated.
      */
-    protected readonly GeneratingEnum $enum;
+    protected GeneratingEnum $enum;
 
     /**
      * Instantiate the class.

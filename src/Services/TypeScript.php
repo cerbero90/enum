@@ -18,14 +18,14 @@ class TypeScript
     /**
      * The TypeScript enums path.
      */
-    protected readonly string $path;
+    protected string $path;
 
     /**
      * Instantiate the class.
      *
      * @param class-string<UnitEnum> $enum
      */
-    public function __construct(protected readonly string $enum)
+    public function __construct(protected string $enum)
     {
         $this->path = Enums::basePath(Enums::typeScript($enum));
     }
