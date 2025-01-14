@@ -28,7 +28,7 @@ class Inspector
      *
      * @var ReflectionEnum<TEnum>
      */
-    protected readonly ReflectionEnum $reflection;
+    protected ReflectionEnum $reflection;
 
     /**
      * The method annotations.
@@ -49,7 +49,7 @@ class Inspector
      *
      * @param class-string<TEnum> $enum
      */
-    public function __construct(protected readonly string $enum)
+    public function __construct(protected string $enum)
     {
         $this->reflection = new ReflectionEnum($enum);
 

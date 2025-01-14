@@ -42,7 +42,7 @@ class Annotator
      *
      * @var Inspector<TEnum>
      */
-    protected readonly Inspector $inspector;
+    protected Inspector $inspector;
 
     /**
      * Instantiate the class.
@@ -50,7 +50,7 @@ class Annotator
      * @param class-string<TEnum> $enum
      * @throws InvalidArgumentException
      */
-    public function __construct(protected readonly string $enum)
+    public function __construct(protected string $enum)
     {
         $this->inspector = new Inspector($enum);
     }
