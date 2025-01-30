@@ -104,8 +104,8 @@ trait SelfAware
     public function resolveItem(callable|string $item): mixed
     {
         return match (true) {
+            is_string($item) && property_exists($this, $item) => $this->$item,
             is_callable($item) => $item($this),
-            property_exists($this, $item) => $this->$item,
             default => $this->resolveMeta($item),
         };
     }

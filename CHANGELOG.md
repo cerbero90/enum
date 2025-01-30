@@ -26,6 +26,12 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
+## 2.3.2 - 2025-01-30
+
+### Fixed
+- Give priority to properties when resolving a case item
+
+
 ## 2.3.1 - 2025-01-15
 
 ### Changed
