@@ -18,7 +18,7 @@ trait Hydrates
      *
      * @throws ValueError
      */
-    public static function from(string $name): static
+    public static function from(int|string $name): static
     {
         return self::fromName($name);
     }
@@ -28,7 +28,7 @@ trait Hydrates
      *
      * @throws ValueError
      */
-    public static function fromName(string $name): static
+    public static function fromName(int|string $name): static
     {
         if ($case = self::tryFromName($name)) {
             return $case;
@@ -40,7 +40,7 @@ trait Hydrates
     /**
      * Retrieve the case hydrated from the given name or NULL.
      */
-    public static function tryFromName(string $name): ?static
+    public static function tryFromName(int|string $name): ?static
     {
         foreach (self::cases() as $case) {
             if ($case->name === $name) {
@@ -55,7 +55,7 @@ trait Hydrates
      * Retrieve the case hydrated from the given name or NULL.
      * This method can be called by pure enums only.
      */
-    public static function tryFrom(string $name): ?static
+    public static function tryFrom(int|string $name): ?static
     {
         return self::tryFromName($name);
     }

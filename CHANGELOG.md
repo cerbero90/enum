@@ -26,6 +26,12 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
+## 2.3.3 - 2025-06-25
+
+### Fixed
+- Type-hinting to avoid IDEs confusion with backed enums native methods
+
+
 ## 2.3.2 - 2025-01-30
 
 ### Fixed
