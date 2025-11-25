@@ -26,6 +26,12 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 
+## 2.3.5 - 2025-11-25
+
+### Fixed
+- Build pipeline
+
+
 ## 2.3.4 - 2025-11-25
 
 ### Added
