@@ -170,6 +170,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
             if ($key === null) {
                 $result[] = $case->resolveItem($value);
             } else {
+                /** @phpstan-ignore offsetAccess.invalidOffset */
                 $result[$case->resolveItem($key)] = $case->resolveItem($value);
             }
         }
@@ -211,6 +212,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
         $keyed = [];
 
         foreach ($this->cases as $case) {
+            /** @phpstan-ignore offsetAccess.invalidOffset */
             $keyed[$case->resolveItem($key)] = $case;
         }
 
@@ -236,6 +238,7 @@ class CasesCollection implements Countable, IteratorAggregate, JsonSerializable,
         $grouped = [];
 
         foreach ($this->cases as $case) {
+            /** @phpstan-ignore offsetAccess.invalidOffset */
             $grouped[$case->resolveItem($key)][] = $case;
         }
 
