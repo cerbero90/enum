@@ -26,7 +26,7 @@ jobs:
               with:
                   php-version: ${{ matrix.php }}
                   tools: composer:v2
-                  coverage: xdebug
+                  coverage: none
 
             - name: Install dependencies
               run: |
@@ -49,7 +49,7 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 8.1
+                  php-version: 8.2
                   extensions: dom, curl, libxml, mbstring, zip
                   tools: composer:v2
                   coverage: xdebug
@@ -58,11 +58,22 @@ jobs:
               run: composer update --prefer-stable --prefer-dist --no-interaction
 
             - name: Execute tests
-              run: vendor/bin/pest --coverage-text --coverage-clover=coverage.clover
+              run: vendor/bin/pest --coverage-text --coverage-clover=coverage.xml
 
-            - name: Upload coverage
-              run: |
-                  vendor/bin/ocular code-coverage:upload --format=php-clover coverage.clover
+            - name: Run Codacy Analysis CLI
+              uses: codacy/codacy-analysis-cli-action@master
+              with:
+                  project-token: ${{ secrets.CODACY_REPO_TOKEN }}
+                  directory: /github/workspace/src
+                  upload: true
+                  verbose: true
+                  max-allowed-issues: 2147483647
+
+            - name: Run Codacy Coverage Reporter
+              uses: codacy/codacy-coverage-reporter-action@v1.3.0
+              with:
+                  project-token: ${{ secrets.CODACY_REPO_TOKEN }}
+                  coverage-reports: coverage.xml
 
     linting:
         runs-on: ubuntu-latest
